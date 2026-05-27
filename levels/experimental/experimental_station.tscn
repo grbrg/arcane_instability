@@ -3,6 +3,7 @@
 [ext_resource type="MeshLibrary" uid="uid://c8t405dsmt0nv" path="res://levels/experimental/tiles.tres" id="1_k2v8w"]
 [ext_resource type="Script" uid="uid://dffgms1eq2n5a" path="res://core/isometric_camera_3d.gd" id="2_73fdw"]
 [ext_resource type="Script" uid="uid://dx0mnikg5y36l" path="res://world/world_simulation.gd" id="3_vekve"]
+[ext_resource type="Script" uid="uid://c8s7xp4da3mgf" path="res://core/input_manager.gd" id="4_vekve"]
 
 [sub_resource type="Sky" id="Sky_k2v8w"]
 
@@ -39,11 +40,15 @@ projection = 1
 size = 10.0
 script = ExtResource("2_73fdw")
 
-[node name="WorldSimulation" type="Node3D" parent="." unique_id=2047512483 node_paths=PackedStringArray("grid", "camera")]
+[node name="WorldSimulation" type="Node3D" parent="." unique_id=2047512483 node_paths=PackedStringArray("camera", "grid")]
 script = ExtResource("3_vekve")
-grid = NodePath("../GridMap")
 camera = NodePath("../IsometricCamera3D")
+grid = NodePath("../GridMap")
 
 [node name="CSGMesh3D" type="CSGMesh3D" parent="." unique_id=406301696]
 use_collision = true
 mesh = SubResource("BoxMesh_73fdw")
+
+[node name="InputManager" type="Node" parent="." unique_id=602915657 node_paths=PackedStringArray("world_simulation")]
+script = ExtResource("4_vekve")
+world_simulation = NodePath("../WorldSimulation")
