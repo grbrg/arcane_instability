@@ -14,4 +14,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if world_simulation:
 			var grid_index = world_simulation.get_grid_index(mouse_pos)
 			if grid_index != Vector3i.MIN:
-				world_simulation.add_effect(grid_index)
+				var adj = StatAdjustment.new()
+				adj.source = "debug"
+				adj.adjustment_type = "spell"
+				adj.adjustment_value = 1.0				
+				world_simulation.add_effect(grid_index, adj)

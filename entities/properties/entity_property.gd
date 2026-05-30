@@ -2,6 +2,9 @@ class_name EntityProperty
 extends Node
 
 
+signal property_changed(source: EntityProperty, amount: float)
+
+
 var base_value: float
 
 var _substance: EntitySubstance
@@ -16,18 +19,26 @@ func _init(_base_value: float, _subst: EntitySubstance) -> void:
 
 
 func add_adjustment(adjustment: StatAdjustment):
+	if not adjustment:
+		return
+
 	# only one adjustment per source allowed
-	if adjustment and not has_adjustment(adjustment.source):
+	if not has_adjustment(adjustment.source):
 		_adjustments.append(adjustment)
+	else:
+		# take the highest/lowest value
+		var existing = get_adjustment_from(adjustment.source) as StatAdjustment
+		if abs(existing.adjustment_value) < abs(adjustment.adjustment_value):
+			existing.adjustment_value = adjustment.adjustment_value
 
 
-func get_adjustments_from(source: String) -> Array[StatAdjustment]:
-	var adjs: Array[StatAdjustment] = []
+
+func get_adjustment_from(source: String) -> StatAdjustment:
 	for adj in _adjustments:
 		if adj is StatAdjustment:
 			if adj.source == source:
-				adjs.append(adj)
-	return adjs
+				return adj
+	return null
 
 
 func get_adjustments_of_type(type: String) -> Array[StatAdjustment]:
@@ -49,8 +60,8 @@ func get_value(val: float, for_type: String = ""):
 
 
 func has_adjustment(source: String) -> bool:
-	var adj = get_adjustments_from(source)
-	if len(adj) > 0:
+	var adj = get_adjustment_from(source)
+	if adj:
 		return true
 
 	return false
@@ -66,5 +77,7 @@ func remove_adjustments(source: String):
 			_adjustments.erase(adj)
 
 
-func tick(_delta: float, ambient: Ambient) -> void:
+##
+func tick(_delta: float, _ambient: Ambient) -> void:
 	pass
+	# Overwrite in subclasses

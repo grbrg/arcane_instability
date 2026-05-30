@@ -5,6 +5,9 @@ extends Node
 ##
 
 
+signal thermal_energy_diffusion(amount: float)
+
+
 ## the states currenty acitve
 var _conditions: Array[Condition]
 
@@ -54,7 +57,9 @@ var mass: EntityProperty
 
 func _init(subst: EntitySubstance) -> void:
 	_substance = subst
-	properties["thermal"] = ThermalEnergy.new(0.1, _substance)
+
+	properties["thermal"] = ThermalEnergy.new(0.0, _substance)
+	properties["thermal"].property_changed.connect(on_property_changed)
 
 
 ##
@@ -68,6 +73,11 @@ func get_property(type: String) -> EntityProperty:
 ## Return the current conditions of the entity
 func get_active_conditions() -> Array[Condition]:
 	return _conditions
+
+
+func on_property_changed(source: EntityProperty, amount: float) -> void:
+	if source is ThermalEnergy:
+		thermal_energy_diffusion.emit(amount)
 
 
 ##
