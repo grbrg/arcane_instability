@@ -9,7 +9,7 @@ extends Node
 func _unhandled_input(event: InputEvent) -> void:
 
 	# handle mouse events
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton and event.is_pressed():
 		var mouse_pos = get_viewport().get_mouse_position()
 		if world_simulation:
 			var grid_index = world_simulation.get_grid_index(mouse_pos)

@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://03ximydmx78r"]
 
+[ext_resource type="Script" uid="uid://b8ryuvv71l5hk" path="res://levels/experimental/dummy_disc.gd" id="1_1lv2g"]
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_302kc"]
 bottom_radius = 1.0
 height = 0.25
@@ -9,6 +11,7 @@ transparency = 1
 albedo_color = Color(1, 0.3372549, 0.19607843, 0.25490198)
 
 [node name="DummyDisc" type="Node3D" unique_id=793498662]
+script = ExtResource("1_1lv2g")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=660688945]
 mesh = SubResource("CylinderMesh_302kc")
