@@ -21,12 +21,11 @@ var sub_entities: Array[Entity]
 var conditions: Array[Condition]
 
 
-func _init(idx: Vector3i, _grid: GridMap) -> void:
+func _init(idx: Vector3i, _grid: GridMap, _subst: EntitySubstance) -> void:
 	index = idx
 	grid = _grid
 
-	# DEBUG:
-	substance = EntitySubstance.new()
+	substance = _subst
 
 	entity = Entity.new(substance)
 	entity.thermal_energy_diffusion.connect(on_thermal_energy_diffusion)

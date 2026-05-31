@@ -32,10 +32,23 @@ func _reset_grid():
 	if grid:
 		var cell_indices = grid.get_used_cells()
 
+		# DEBUG substances
+		var water = EntitySubstance.new()
+		water.heat_capacity = 0.99
+		water.heat_conductivity = 0.1
+		var copper = EntitySubstance.new()
+		copper.heat_capacity = 0.25
+		copper.heat_conductivity = 0.9
+
 		# first add all cells
 		for cell_index in cell_indices:
-			var new_cell = GridCell.new(cell_index, grid)
-			new_cell.ambient = _ambient
+			var subst = copper
+			if cell_index.x > 0:
+				subst = water
+
+			var new_cell = GridCell.new(cell_index, grid, subst)
+			new_cell.ambient = _ambient			
+
 			_cells[cell_index] = new_cell
 			add_child(new_cell)
 
@@ -60,9 +73,10 @@ func _process(delta: float) -> void:
 
 
 func add_effect(index: Vector3i, adj: StatAdjustment) -> void:
-	var cell = _cells[index]
-	if cell:
-		cell.add_effect("thermal", adj)
+	if index in _cells:
+		var cell = _cells[index]
+		if cell:
+			cell.add_effect("thermal", adj)
 
 
 ##

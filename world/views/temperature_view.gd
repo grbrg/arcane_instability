@@ -22,4 +22,4 @@ func update(ambient: Ambient) -> void:
 		if thermal:
 			var temp = thermal.get_temperature(ambient)
 			set_temperature(temp)
-			Log.d("Temperature: " + str(temp) + "°")
+			Log.v("Temperature: " + str(temp) + "°")

@@ -6,7 +6,7 @@ extends EntityProperty
 
 ##
 func get_temperature(ambient: Ambient) -> float:
-	return ambient.temperature + (get_value(base_value) / _substance.heat_capacity)
+	return ambient.temperature + (get_value(base_value) * _substance.heat_capacity)
 
 
 ##
@@ -15,10 +15,9 @@ func tick(delta: float, _ambient: Ambient) -> void:
 	var adjs = get_adjustments_of_type("spell")
 	for adj in adjs:
 		# Move the stored energy towards 0.0 so the temperature settles back to
-		# ambient.temperature (temperature == ambient + value / heat_capacity).
-		# Higher conductivity equalises faster; higher heat_capacity (more
-		# thermal mass) resists the change and slows it down.
-		var equalization = clamp(_substance.heat_conductivity * (1.0 - _substance.heat_capacity), 0.0, 1.0)
+		# ambient.temperature (temperature == ambient + value * heat_capacity).
+		# Conductivity drives the decay: higher conductivity equalises faster.
+		var equalization = clamp(_substance.heat_conductivity, 0.0, 1.0)
 		var new_val = lerp(adj.adjustment_value, 0.0, 1.0 - pow(1.0 - equalization, delta))
 		
 		# a part of the heat diffuses to its neighbours
@@ -33,7 +32,7 @@ func tick(delta: float, _ambient: Ambient) -> void:
 			Log.d("Thermal energy: reset")
 		"""
 
-		Log.d("Thermal energy: " + str(adj.adjustment_value))
+		Log.v("Thermal energy: " + str(adj.adjustment_value))
 
 
 
