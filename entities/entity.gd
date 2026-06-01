@@ -17,7 +17,7 @@ var properties = {}
 
 
 
-## WIP: will be removed
+## WIP: will be removed:
 
 var movability: EntityProperty
 
@@ -58,8 +58,8 @@ var mass: EntityProperty
 func _init(subst: EntitySubstance) -> void:
 	_substance = subst
 
-	properties["thermal"] = ThermalEnergy.new(0.0, _substance)
-	properties["thermal"].property_changed.connect(on_property_changed)
+	properties["thermal"] = _substance.create_thermal_property()
+	properties["thermal"].property_value_changed.connect(on_property_value_changed)
 
 
 ##
@@ -75,7 +75,7 @@ func get_active_conditions() -> Array[Condition]:
 	return _conditions
 
 
-func on_property_changed(source: EntityProperty, amount: float) -> void:
+func on_property_value_changed(source: EntityProperty, amount: float) -> void:
 	if source is ThermalEnergy:
 		thermal_energy_diffusion.emit(amount)
 

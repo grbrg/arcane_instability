@@ -16,6 +16,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			if grid_index != Vector3i.MIN:
 				var adj = StatAdjustment.new()
 				adj.source = "debug"
-				adj.adjustment_type = "spell"
+				adj.adjustment_type = "value" # we adjust the value directly
 				adj.adjustment_value = 1.0				
 				world_simulation.add_effect(grid_index, adj)

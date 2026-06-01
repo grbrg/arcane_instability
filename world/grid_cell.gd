@@ -36,11 +36,6 @@ func add_effect(type: String, adj: StatAdjustment) -> void:
 	# check if we can add thermal properties
 	var prop = entity.get_property(type) #as ThermalEnergy
 	if prop:
-		"""var adj = StatAdjustment.new()
-		adj.source = "debug"
-		adj.adjustment_type = "spell"
-		adj.adjustment_value = amount		
-		"""
 		prop.add_adjustment(adj)
 
 		if not type in _property_views:

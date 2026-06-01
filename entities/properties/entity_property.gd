@@ -2,22 +2,29 @@ class_name EntityProperty
 extends Node
 
 
-signal property_changed(source: EntityProperty, amount: float)
+signal property_value_changed(source: EntityProperty, amount: float)
 
 
 var base_value: float
 
-var _substance: EntitySubstance
+var capacity: float = 0.9
+
+var conductivity = 0.9
+
+var decay = 0.1
 
 var _adjustments = []
 
 
 ##
-func _init(_base_value: float, _subst: EntitySubstance) -> void:
+func _init(_base_value: float, _cap: float, _cond: float, _decay: float) -> void:
 	base_value = _base_value
-	_substance = _subst
+	capacity = _cap
+	conductivity = _cond
+	decay = _decay
 
 
+##
 func add_adjustment(adjustment: StatAdjustment):
 	if not adjustment:
 		return
@@ -32,7 +39,7 @@ func add_adjustment(adjustment: StatAdjustment):
 			existing.adjustment_value = adjustment.adjustment_value
 
 
-
+##
 func get_adjustment_from(source: String) -> StatAdjustment:
 	for adj in _adjustments:
 		if adj is StatAdjustment:
@@ -41,6 +48,11 @@ func get_adjustment_from(source: String) -> StatAdjustment:
 	return null
 
 
+## Return the adjustments of the given type:
+# - value
+# - capacity
+# - conductivity
+# - decay
 func get_adjustments_of_type(type: String) -> Array[StatAdjustment]:
 	var adjs: Array[StatAdjustment] = []
 	for adj in _adjustments:
@@ -50,15 +62,47 @@ func get_adjustments_of_type(type: String) -> Array[StatAdjustment]:
 	return adjs
 
 
-func get_value(val: float, for_type: String = ""):
-	var v = val
+##
+func get_capacity():
+	var v = capacity
 	for adj in _adjustments:
-		if for_type.is_empty() or for_type == adj.adjustment_type:
+		if "capacity" == adj.adjustment_type:
 			v += adj.adjustment_value
 			v *= adj.adjustment_factor
 	return v
 
 
+##
+func get_conductivity():
+	var v = conductivity
+	for adj in _adjustments:
+		if "conductivity" == adj.adjustment_type:
+			v += adj.adjustment_value
+			v *= adj.adjustment_factor
+	return v
+
+
+##
+func get_decay():
+	var v = decay
+	for adj in _adjustments:
+		if "decay" == adj.adjustment_type:
+			v += adj.adjustment_value
+			v *= adj.adjustment_factor
+	return v
+
+
+##
+func get_value():
+	var v = base_value
+	for adj in _adjustments:
+		if "value" == adj.adjustment_type:
+			v += adj.adjustment_value
+			v *= adj.adjustment_factor
+	return v
+
+
+##
 func has_adjustment(source: String) -> bool:
 	var adj = get_adjustment_from(source)
 	if adj:
@@ -67,10 +111,12 @@ func has_adjustment(source: String) -> bool:
 	return false
 
 
+##
 func remove_adjustment(adjustment: StatAdjustment):
 	_adjustments.erase(adjustment)
 
 
+##
 func remove_adjustments(source: String):
 	for adj in _adjustments:
 		if adj.source == source:
