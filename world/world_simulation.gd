@@ -38,7 +38,7 @@ func _reset_grid():
 		water.heat_conductivity = 0.1
 		var copper = EntitySubstance.new()
 		copper.heat_capacity = 0.25
-		copper.heat_conductivity = 0.9
+		copper.heat_conductivity = 0.2
 
 		# first add all cells
 		for cell_index in cell_indices:
@@ -47,7 +47,7 @@ func _reset_grid():
 				subst = water
 
 			var new_cell = GridCell.new(cell_index, grid, subst)
-			new_cell.ambient = _ambient			
+			new_cell.ambient = _ambient
 
 			_cells[cell_index] = new_cell
 			add_child(new_cell)
@@ -55,13 +55,16 @@ func _reset_grid():
 		# then connect them
 		for cell_index in cell_indices:
 			var my_cell = _cells[cell_index]
-			for x in [-1 , 1]:
-				for z in [-1 , 1]:
-					var neighbour = Vector3i(cell_index.x + x, cell_index.y, cell_index.z + z)
-					if neighbour in _cells:
-						var neighbour_cell = _cells[neighbour]
-						my_cell.neighbours.append(neighbour_cell)
+			_add_neighbour(my_cell, Vector3i(cell_index.x +1, cell_index.y, cell_index.z))
+			_add_neighbour(my_cell, Vector3i(cell_index.x -1, cell_index.y, cell_index.z))
+			_add_neighbour(my_cell, Vector3i(cell_index.x, cell_index.y, cell_index.z + 1))
+			_add_neighbour(my_cell, Vector3i(cell_index.x, cell_index.y, cell_index.z - 1))
 
+
+func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
+	if neighbour in _cells:
+		var neighbour_cell = _cells[neighbour]
+		cell.neighbours.append(neighbour_cell)
 
 ##
 func _process(delta: float) -> void:

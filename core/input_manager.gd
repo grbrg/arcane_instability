@@ -14,8 +14,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		if world_simulation:
 			var grid_index = world_simulation.get_grid_index(mouse_pos)
 			if grid_index != Vector3i.MIN:
-				var adj = StatAdjustment.new()
-				adj.source = "debug"
-				adj.adjustment_type = "value" # we adjust the value directly
-				adj.adjustment_value = 1.0				
-				world_simulation.add_effect(grid_index, adj)
+				if event.button_index == MOUSE_BUTTON_LEFT:
+					var adj = StatAdjustment.new()
+					adj.source = "debug" + str(Time.get_ticks_msec())
+					adj.adjustment_type = "value" # we adjust the value directly
+					adj.adjustment_value = 1.0				
+					world_simulation.add_effect(grid_index, adj)
+				if event.button_index == MOUSE_BUTTON_RIGHT:
+					var adj = StatAdjustment.new()
+					adj.source = "debug" + str(Time.get_ticks_msec())
+					adj.adjustment_type = "value" # we adjust the value directly
+					adj.adjustment_value = -1.0				
+					world_simulation.add_effect(grid_index, adj)

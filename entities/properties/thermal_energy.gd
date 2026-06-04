@@ -18,9 +18,9 @@ func tick(delta: float, _ambient: Ambient) -> void:
 		# ambient.temperature (temperature == ambient + value * capacity).
 		# Conductivity drives the decay: higher conductivity equalises faster.
 		var new_val = lerp(adj.adjustment_value, 0.0, 1.0 - pow(1.0 - get_decay(), delta))
-		
+
 		# a part of the heat diffuses to its neighbours
-		property_value_changed.emit(self, new_val * get_conductivity())
+		property_value_changed.emit(self)
 
 		adj.adjustment_value = new_val
 
@@ -34,7 +34,7 @@ func tick(delta: float, _ambient: Ambient) -> void:
 		adj.adjustment_factor = lerp(adj.adjustment_factor, 1.0, 1.0 - pow(1.0 - get_conductivity(), delta))
 		if abs(1.0 - adj.adjustment_factor) < 0.01:
 			adj.adjustment_factor = 1.0
-		
+
 		# we no longer have an effect, remove it
 		if adj.adjustment_factor == 1.0 and adj.adjustment_value == 0.0:
 			remove_adjustment(adj)

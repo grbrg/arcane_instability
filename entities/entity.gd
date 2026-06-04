@@ -1,11 +1,11 @@
 class_name Entity
 extends Node
 ##
-# 
+#
 ##
 
 
-signal thermal_energy_diffusion(amount: float)
+signal property_diffusion(type: String)
 
 
 ## the states currenty acitve
@@ -66,7 +66,7 @@ func _init(subst: EntitySubstance) -> void:
 func get_property(type: String) -> EntityProperty:
 	if type in properties:
 		return properties[type]
-	
+
 	return null
 
 
@@ -75,9 +75,9 @@ func get_active_conditions() -> Array[Condition]:
 	return _conditions
 
 
-func on_property_value_changed(source: EntityProperty, amount: float) -> void:
+func on_property_value_changed(source: EntityProperty) -> void:
 	if source is ThermalEnergy:
-		thermal_energy_diffusion.emit(amount)
+		property_diffusion.emit("thermal")
 
 
 ##

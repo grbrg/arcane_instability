@@ -2,14 +2,14 @@ class_name EntityProperty
 extends Node
 
 
-signal property_value_changed(source: EntityProperty, amount: float)
+signal property_value_changed(source: EntityProperty)
 
 
 var base_value: float
 
 var capacity: float = 0.9
 
-var conductivity = 0.9
+var conductivity = 0.0
 
 var decay = 0.1
 
@@ -99,6 +99,7 @@ func get_value():
 		if "value" == adj.adjustment_type:
 			v += adj.adjustment_value
 			v *= adj.adjustment_factor
+
 	return v
 
 
