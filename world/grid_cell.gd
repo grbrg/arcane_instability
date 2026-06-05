@@ -30,6 +30,8 @@ func _init(idx: Vector3i, _grid: GridMap, _subst: EntitySubstance) -> void:
 	entity = Entity.new(substance)
 	entity.property_diffusion.connect(on_property_diffusion)
 
+	add_condition(BurningCondition.new())
+
 
 ##
 func add_effect(type: String, adj: StatAdjustment) -> void:
@@ -47,24 +49,22 @@ func add_effect(type: String, adj: StatAdjustment) -> void:
 			_property_views[type] = temperature_view
 
 
+func add_condition(cond: Condition) -> void:
+	conditions.append(cond)
+	add_child(cond)
+
+
 func _add_property_view(type: String, view: EntityPropertyView, prop: EntityProperty) -> void:
 	_property_views[type] = view
 	view.cell = self
 	view.my_property = prop
 
 
-func _ready() -> void:
-	# gather all conditions
-	for child in get_children():
-		if child is Condition:
-			conditions.append(child)
-
-
 ## TODO: Do we need this? Or is this done automatically
 func activate_condition(condition: Condition) -> bool:
 	for c in conditions:
 		if c.type == condition.type:
-			c.is_active = true
+			c.activate(self)
 			return true
 
 	return false
@@ -85,7 +85,7 @@ func can_have_condition(type: String) -> bool:
 func has_active_condition(type: String) -> bool:
 	for c in conditions:
 		if c.type == type:
-			return c.is_active
+			return c.is_active()
 
 	# TODO: check all child entitities (objects) on this cell?
 
@@ -108,10 +108,23 @@ func on_property_diffusion(type: String):
 		n.add_effect(type, adj)
 
 
+##
 func tick(delta: float) -> void:
+	# update the enitity properties
 	entity.tick(delta, ambient)
 
+	# update the views based on that
 	for key in _property_views:
 		var view = _property_views[key]
 		view.update(ambient)
 
+	# check for conditions
+	for cond in conditions:
+		# check if it should deactivate
+		if cond.check_deactiviation(entity, ambient):
+			cond.deactivate(self)
+		elif cond.check_activation(entity, ambient):
+			var cv = cond.activate(self) as ConditionView
+			if cv:
+				add_child(cv)
+				cv.position = grid.map_to_local(index)

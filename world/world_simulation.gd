@@ -11,15 +11,12 @@ const TICK_TIME = 1.0
 
 var _cells = {}
 
-var _condition_engine: ConditionEngine
-
 var _ambient: Ambient
 
 var _time_since_tick: float
 
 
 func _ready() -> void:
-	_condition_engine = ConditionEngine.new()
 	_ambient = Ambient.new()
 	_reset_grid()
 
@@ -100,13 +97,3 @@ func _tick(delta: float) -> void:
 	for index in _cells:
 		var cell = _cells[index]
 		cell.tick(delta)
-
-	# propagate attributes
-	# e. g. temperature spreads slowly to neighbours
-
-
-	# update each condition
-	for index in _cells:
-		_condition_engine.tick(delta, _cells[index])
-
-	#
