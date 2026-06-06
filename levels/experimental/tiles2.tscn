@@ -1,0 +1,272 @@
+[gd_scene format=4 uid="uid://8rvcpx635trf"]
+
+[ext_resource type="PackedScene" uid="uid://d1p2pth00qnp7" path="res://levels/experimental/models2/ground_pathBend.glb" id="129_vjubp"]
+[ext_resource type="PackedScene" uid="uid://cstdm0i615xjp" path="res://levels/experimental/models2/ground_pathBendBank.glb" id="130_706no"]
+[ext_resource type="PackedScene" uid="uid://os6suj0pylyf" path="res://levels/experimental/models2/ground_pathCorner.glb" id="131_jh0pk"]
+[ext_resource type="PackedScene" uid="uid://d3jiht5psbwoh" path="res://levels/experimental/models2/ground_pathCornerSmall.glb" id="132_iaql2"]
+[ext_resource type="PackedScene" uid="uid://b0igfu6qwtc8e" path="res://levels/experimental/models2/ground_pathCross.glb" id="133_ktwfh"]
+[ext_resource type="PackedScene" uid="uid://defco8oilebpu" path="res://levels/experimental/models2/ground_pathEnd.glb" id="134_lwerc"]
+[ext_resource type="PackedScene" uid="uid://nuukd8myt77q" path="res://levels/experimental/models2/ground_pathEndClosed.glb" id="135_2t6cp"]
+[ext_resource type="PackedScene" uid="uid://g6mshqx5agcn" path="res://levels/experimental/models2/ground_pathRocks.glb" id="137_60xfb"]
+[ext_resource type="PackedScene" uid="uid://dvlg25swfx0hv" path="res://levels/experimental/models2/ground_pathSide.glb" id="138_2bpjm"]
+[ext_resource type="PackedScene" uid="uid://cbcmfr802n2ia" path="res://levels/experimental/models2/ground_pathSideOpen.glb" id="139_ypqqh"]
+[ext_resource type="PackedScene" uid="uid://bt3guh0e6mg6k" path="res://levels/experimental/models2/ground_pathSplit.glb" id="140_ao2k6"]
+[ext_resource type="PackedScene" uid="uid://er1cghtfnx1u" path="res://levels/experimental/models2/ground_pathStraight.glb" id="141_pgsjt"]
+[ext_resource type="PackedScene" uid="uid://dd6e44s536xyi" path="res://levels/experimental/models2/ground_pathTile.glb" id="142_ogt0v"]
+[ext_resource type="PackedScene" uid="uid://cjf7pmp5trss2" path="res://levels/experimental/models2/ground_riverBend.glb" id="143_0330x"]
+[ext_resource type="PackedScene" uid="uid://b3k0b3ireg8jf" path="res://levels/experimental/models2/ground_riverBendBank.glb" id="144_mjdnj"]
+[ext_resource type="PackedScene" uid="uid://dtvqatgucjecr" path="res://levels/experimental/models2/ground_riverCorner.glb" id="145_qtn3m"]
+[ext_resource type="PackedScene" uid="uid://c3ce2xuar6826" path="res://levels/experimental/models2/ground_riverCornerSmall.glb" id="146_e6ve6"]
+[ext_resource type="PackedScene" uid="uid://bct2uoorpqbmk" path="res://levels/experimental/models2/ground_riverCross.glb" id="147_522cj"]
+[ext_resource type="PackedScene" uid="uid://df806ana4xbtu" path="res://levels/experimental/models2/ground_riverEnd.glb" id="148_u4qux"]
+[ext_resource type="PackedScene" uid="uid://bjcq7jocoy4fn" path="res://levels/experimental/models2/ground_riverEndClosed.glb" id="149_84py2"]
+[ext_resource type="PackedScene" uid="uid://baaek8gwhy5et" path="res://levels/experimental/models2/ground_riverRocks.glb" id="151_p2vh8"]
+[ext_resource type="PackedScene" uid="uid://bdc7ge4rxyr20" path="res://levels/experimental/models2/ground_riverSide.glb" id="152_cxpym"]
+[ext_resource type="PackedScene" uid="uid://8h331uld4suf" path="res://levels/experimental/models2/ground_riverSideOpen.glb" id="153_x8e0j"]
+[ext_resource type="PackedScene" uid="uid://cuobuifhgpkaj" path="res://levels/experimental/models2/ground_riverSplit.glb" id="154_ilpau"]
+[ext_resource type="PackedScene" uid="uid://cryv0nspc8lhh" path="res://levels/experimental/models2/ground_riverStraight.glb" id="155_jfqxa"]
+[ext_resource type="PackedScene" uid="uid://coxu2fsisfrrj" path="res://levels/experimental/models2/ground_riverTile.glb" id="156_7osak"]
+[ext_resource type="PackedScene" uid="uid://duv4d2uv3lbxn" path="res://levels/experimental/models2/stone_largeA.glb" id="227_mtneh"]
+[ext_resource type="PackedScene" uid="uid://di08h57248u5s" path="res://levels/experimental/models2/tree_cone.glb" id="271_ui215"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_otdj2"]
+resource_name = "grass"
+albedo_color = Color(0.45234028, 0.92950165, 0.8658767, 1)
+metallic = 1.0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_2gle3"]
+_surfaces = [{
+"aabb": AABB(-0.5, 0, -0.5, 1, 1e-05, 1),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray("AAABAAIAAgADAAAA"),
+"name": "grass",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("//8AAP//AAAAAAAA//8AAAAAAAAAAAAA//8AAAAAAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_pylph"]
+resource_name = "ground_grass_Mesh ground_grass"
+_surfaces = [{
+"aabb": AABB(-0.5, 0, -0.5, 1, 1e-05, 1),
+"attribute_data": PackedByteArray("/////wAA//8AAGAM//9gDA=="),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray("AAABAAIAAgADAAAA"),
+"material": SubResource("StandardMaterial3D_otdj2"),
+"name": "grass",
+"primitive": 3,
+"uv_scale": Vector4(39.37008, 41.37008, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("//8AAP///78AAAAA////vwAAAAAAAP+///8AAAAA/7////9/////f////3////9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_2gle3")
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_xu5q7"]
+data = PackedVector3Array(0.5, 0, 0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, -0.5, 0, -0.5, 0.5, 0, -0.5, 0.5, 0, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_egwuo"]
+resource_name = "dirt"
+albedo_color = Color(0.9482425, 0.7443257, 0.6190008, 1)
+metallic = 1.0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_c2s0p"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.05, -0.5, 1, 1e-05, 1),
+"format": 34896613377,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAwAAAAIAAwAEAAAABQADAAIAAgAGAAUAAwAHAAQACAAEAAcABwAJAAgA"),
+"name": "dirt",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 10,
+"vertex_data": PackedByteArray("ckgAAP//AAAAAAAA//8AAAAAAACMtwAA//8AAAAAAACMtwAA//8AAAAAAAAAAAAAAAAAAHJIAAD//wAAckgAAP//AAD//wAA//8AAIy3AAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_lsvg2"]
+resource_name = "ground_pathOpen_Mesh ground_pathOpen"
+_surfaces = [{
+"aabb": AABB(-0.5, -0.05, -0.5, 1, 1e-05, 1),
+"attribute_data": PackedByteArray("ckj//wAA//8AAA27//9gDIy3//8AAGAMAABSUf//UlH///////8Nuw=="),
+"format": 34896613399,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAwAAAAIAAwAEAAAABQADAAIAAgAGAAUAAwAHAAQACAAEAAcABwAJAAgA"),
+"material": SubResource("StandardMaterial3D_egwuo"),
+"name": "dirt",
+"primitive": 3,
+"uv_scale": Vector4(39.37008, 41.37008, 0, 0),
+"vertex_count": 10,
+"vertex_data": PackedByteArray("ckgAAP///78AAAAA////vwAAAACMt/+///8AAAAA/7+MtwAA////vwAAAAAAAP+/AAAAAHJI/7///wAAckj/v///AAD///+///8AAIy3/7////9/////f////3////9/////f////3////9/////f////3////9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_c2s0p")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_f3pog"]
+points = PackedVector3Array(-0.5, -0.05, -0.5, -0.5, -0.05, 0.5, 0.5, -0.05, -0.5, 0.5, -0.05, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o7ukf"]
+resource_name = "water"
+albedo_color = Color(0.8489776, 0.9807934, 1, 1)
+metallic = 1.0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_bohlo"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.05, -0.5, 1, 1e-05, 1),
+"format": 34896613377,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAwAAAAIAAwAEAAAABQADAAIAAgAGAAUAAwAHAAQACAAEAAcABwAJAAgA"),
+"name": "water",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 10,
+"vertex_data": PackedByteArray("ckgAAP//AAAAAAAA//8AAAAAAACMtwAA//8AAAAAAACMtwAA//8AAAAAAAAAAAAAAAAAAHJIAAD//wAAckgAAP//AAD//wAA//8AAIy3AAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_hkchc"]
+resource_name = "ground_riverOpen_Mesh ground_riverOpen"
+_surfaces = [{
+"aabb": AABB(-0.5, -0.05, -0.5, 1, 1e-05, 1),
+"attribute_data": PackedByteArray("ckj//wAA//8AAA27//9gDIy3//8AAGAMAABSUf//UlH///////8Nuw=="),
+"format": 34896613399,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAwAAAAIAAwAEAAAABQADAAIAAgAGAAUAAwAHAAQACAAEAAcABwAJAAgA"),
+"material": SubResource("StandardMaterial3D_o7ukf"),
+"name": "water",
+"primitive": 3,
+"uv_scale": Vector4(39.37008, 41.37008, 0, 0),
+"vertex_count": 10,
+"vertex_data": PackedByteArray("ckgAAP///78AAAAA////vwAAAACMt/+///8AAAAA/7+MtwAA////vwAAAAAAAP+/AAAAAHJI/7///wAAckj/v///AAD///+///8AAIy3/7////9/////f////3////9/////f////3////9/////f////3////9/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_bohlo")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_cfsn1"]
+points = PackedVector3Array(-0.5, -0.05, -0.5, -0.5, -0.05, 0.5, 0.5, -0.05, -0.5, 0.5, -0.05, 0.5)
+
+[node name="Tiles2" type="Node3D" unique_id=329145304]
+
+[node name="ground_grass2" type="Node3D" parent="." unique_id=1857840693]
+visible = false
+
+[node name="ground_grass" type="MeshInstance3D" parent="ground_grass2" unique_id=242911027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+mesh = SubResource("ArrayMesh_pylph")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground_grass2/ground_grass" unique_id=843301719]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground_grass2/ground_grass/StaticBody3D" unique_id=602045407]
+shape = SubResource("ConcavePolygonShape3D_xu5q7")
+
+[node name="ground_pathBend2" parent="." unique_id=280121184 instance=ExtResource("129_vjubp")]
+visible = false
+
+[node name="ground_pathBendBank2" parent="." unique_id=1389347466 instance=ExtResource("130_706no")]
+visible = false
+
+[node name="ground_pathCorner2" parent="." unique_id=1457720877 instance=ExtResource("131_jh0pk")]
+visible = false
+
+[node name="ground_pathCornerSmall2" parent="." unique_id=480336665 instance=ExtResource("132_iaql2")]
+visible = false
+
+[node name="ground_pathCross2" parent="." unique_id=167843885 instance=ExtResource("133_ktwfh")]
+visible = false
+
+[node name="ground_pathEnd2" parent="." unique_id=20850072 instance=ExtResource("134_lwerc")]
+visible = false
+
+[node name="ground_pathEndClosed2" parent="." unique_id=1426194968 instance=ExtResource("135_2t6cp")]
+visible = false
+
+[node name="ground_pathOpen2" type="Node3D" parent="." unique_id=536686910]
+visible = false
+
+[node name="ground_pathOpen" type="MeshInstance3D" parent="ground_pathOpen2" unique_id=1422965347]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+mesh = SubResource("ArrayMesh_lsvg2")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground_pathOpen2/ground_pathOpen" unique_id=75275659]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground_pathOpen2/ground_pathOpen/StaticBody3D" unique_id=800864047]
+shape = SubResource("ConvexPolygonShape3D_f3pog")
+
+[node name="ground_pathRocks2" parent="." unique_id=2123629253 instance=ExtResource("137_60xfb")]
+visible = false
+
+[node name="ground_pathSide2" parent="." unique_id=353405866 instance=ExtResource("138_2bpjm")]
+visible = false
+
+[node name="ground_pathSideOpen2" parent="." unique_id=1535201094 instance=ExtResource("139_ypqqh")]
+visible = false
+
+[node name="ground_pathSplit2" parent="." unique_id=1961067210 instance=ExtResource("140_ao2k6")]
+visible = false
+
+[node name="ground_pathStraight2" parent="." unique_id=510174045 instance=ExtResource("141_pgsjt")]
+visible = false
+
+[node name="ground_pathTile2" parent="." unique_id=227461445 instance=ExtResource("142_ogt0v")]
+visible = false
+
+[node name="ground_riverBend2" parent="." unique_id=1861787469 instance=ExtResource("143_0330x")]
+visible = false
+
+[node name="ground_riverBendBank2" parent="." unique_id=1056683987 instance=ExtResource("144_mjdnj")]
+visible = false
+
+[node name="ground_riverCorner2" parent="." unique_id=839795021 instance=ExtResource("145_qtn3m")]
+visible = false
+
+[node name="ground_riverCornerSmall2" parent="." unique_id=2043624808 instance=ExtResource("146_e6ve6")]
+visible = false
+
+[node name="ground_riverCross2" parent="." unique_id=1753515278 instance=ExtResource("147_522cj")]
+visible = false
+
+[node name="ground_riverEnd2" parent="." unique_id=755157388 instance=ExtResource("148_u4qux")]
+visible = false
+
+[node name="ground_riverEndClosed2" parent="." unique_id=277986457 instance=ExtResource("149_84py2")]
+visible = false
+
+[node name="ground_riverOpen2" type="Node3D" parent="." unique_id=1498003323]
+visible = false
+
+[node name="ground_riverOpen" type="MeshInstance3D" parent="ground_riverOpen2" unique_id=1889870624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+mesh = SubResource("ArrayMesh_hkchc")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground_riverOpen2/ground_riverOpen" unique_id=1390524441]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground_riverOpen2/ground_riverOpen/StaticBody3D" unique_id=769016997]
+shape = SubResource("ConvexPolygonShape3D_cfsn1")
+
+[node name="ground_riverRocks2" parent="." unique_id=564201206 instance=ExtResource("151_p2vh8")]
+visible = false
+
+[node name="ground_riverSide2" parent="." unique_id=406115750 instance=ExtResource("152_cxpym")]
+visible = false
+
+[node name="ground_riverSideOpen2" parent="." unique_id=998729100 instance=ExtResource("153_x8e0j")]
+visible = false
+
+[node name="ground_riverSplit2" parent="." unique_id=1318716776 instance=ExtResource("154_ilpau")]
+visible = false
+
+[node name="ground_riverStraight2" parent="." unique_id=614139955 instance=ExtResource("155_jfqxa")]
+visible = false
+
+[node name="ground_riverTile2" parent="." unique_id=138124024 instance=ExtResource("156_7osak")]
+visible = false
+
+[node name="stone_largeA2" parent="." unique_id=1089509565 instance=ExtResource("227_mtneh")]
+visible = false
+
+[node name="tree_cone2" parent="." unique_id=1465724030 instance=ExtResource("271_ui215")]
+visible = false
