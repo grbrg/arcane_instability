@@ -11,7 +11,7 @@ signal property_diffusion(type: String)
 ## the states currenty acitve
 var _conditions: Array[Condition]
 
-var _substance: EntitySubstance
+var substance: Substance
 
 var properties = {}
 
@@ -55,11 +55,11 @@ var mass: EntityProperty
 
 
 
-func _init(subst: EntitySubstance) -> void:
-	_substance = subst
+##
+func _init(subst: Substance) -> void:
+	substance = subst
 
-	properties["thermal"] = _substance.create_thermal_property()
-	properties["thermal"].property_value_changed.connect(on_property_value_changed)
+	properties = substance.create_properties()
 
 
 ##
@@ -75,6 +75,7 @@ func get_active_conditions() -> Array[Condition]:
 	return _conditions
 
 
+##
 func on_property_value_changed(source: EntityProperty) -> void:
 	if source is ThermalEnergy:
 		property_diffusion.emit("thermal")
@@ -85,3 +86,4 @@ func tick(delta: float, ambient: Ambient) -> void:
 	for prop_type in properties:
 		var property = properties[prop_type]
 		property.tick(delta, ambient)
+

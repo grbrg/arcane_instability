@@ -103,6 +103,7 @@ color = Color(1, 0.68235296, 0.2627451, 1)
 
 [sub_resource type="Animation" id="Animation_sarj3"]
 resource_name = "Init"
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true

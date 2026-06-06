@@ -11,7 +11,7 @@ var entity: Entity
 #
 var _property_views = {} #: Array[EntityPropertyView]
 
-var substance: EntitySubstance
+var substance: Substance
 
 var ambient: Ambient
 
@@ -21,7 +21,7 @@ var sub_entities: Array[Entity]
 var conditions: Array[Condition]
 
 
-func _init(idx: Vector3i, _grid: GridMap, _subst: EntitySubstance) -> void:
+func _init(idx: Vector3i, _grid: GridMap, _subst: Substance) -> void:
 	index = idx
 	grid = _grid
 
@@ -60,7 +60,7 @@ func _add_property_view(type: String, view: EntityPropertyView, prop: EntityProp
 	view.my_property = prop
 
 
-## TODO: Do we need this? Or is this done automatically
+## 
 func activate_condition(condition: Condition) -> bool:
 	for c in conditions:
 		if c.type == condition.type:

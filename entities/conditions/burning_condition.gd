@@ -7,12 +7,14 @@ extends Condition
 
 ##
 func activate(cell: GridCell) -> ConditionView:
-	super.activate(cell)
+	if not _is_active:
+		super.activate(cell)
 
-	var fire = burning_scene.instantiate() as BurningView
-	_scene = fire
+		var fire = burning_scene.instantiate() as BurningView
+		_scene = fire
 
-	return _scene
+		return _scene
+	return null
 
 
 ## Checks whether the condition should be activated
@@ -22,7 +24,7 @@ func check_activation(_entity: Entity, _ambient: Ambient) -> bool:
 
 	var thermal = _entity.properties["thermal"] as ThermalEnergy
 	var temp = thermal.get_temperature(_ambient)
-	if temp > 0.6:
+	if temp > _entity.substance.burning_temperature:
 		return true
 
 	return false

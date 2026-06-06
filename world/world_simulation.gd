@@ -29,19 +29,16 @@ func _reset_grid():
 	if grid:
 		var cell_indices = grid.get_used_cells()
 
-		# DEBUG substances
-		var water = EntitySubstance.new()
-		water.heat_capacity = 0.99
-		water.heat_conductivity = 0.1
-		var copper = EntitySubstance.new()
-		copper.heat_capacity = 0.25
-		copper.heat_conductivity = 0.2
-
 		# first add all cells
 		for cell_index in cell_indices:
-			var subst = copper
+			var subst = null
 			if cell_index.x > 0:
-				subst = water
+				subst = SubstanceRegistry.get_substance("water")
+			else:
+				if cell_index.z > 0:
+					subst = SubstanceRegistry.get_substance("gras")
+				else:
+					subst = SubstanceRegistry.get_substance("copper")
 
 			var new_cell = GridCell.new(cell_index, grid, subst)
 			new_cell.ambient = _ambient
