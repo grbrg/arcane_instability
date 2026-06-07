@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://swtfucmv1dl8"]
 
 [ext_resource type="Script" uid="uid://cmup3e5ugasbv" path="res://core/player.gd" id="1_3x74s"]
+[ext_resource type="PackedScene" uid="uid://bxq1galmnqwox" path="res://ui/spell_marker.tscn" id="2_ptdtg"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_3x74s"]
 radius = 0.25
@@ -22,3 +23,6 @@ mesh = SubResource("CapsuleMesh_3x74s")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=680073561]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("CapsuleShape3D_u2d7q")
+
+[node name="SpellMarker" parent="." unique_id=713141183 instance=ExtResource("2_ptdtg")]
+visible = false

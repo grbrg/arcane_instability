@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bxq1galmnqwox"]
+
+[ext_resource type="Script" uid="uid://b6sov4nl0wrk3" path="res://ui/spell_marker.gd" id="1_x6l8y"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dbmxf"]
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x6l8y"]
+albedo_color = Color(0, 1, 0, 0.49803922)
+
+[node name="SpellMarker" type="Node3D" unique_id=713141183]
+script = ExtResource("1_x6l8y")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=590456894]
+mesh = SubResource("CylinderMesh_dbmxf")
+surface_material_override/0 = SubResource("StandardMaterial3D_x6l8y")
