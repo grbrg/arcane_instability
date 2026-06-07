@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dffgms1eq2n5a" path="res://core/isometric_camera_3d.gd" id="2_73fdw"]
 [ext_resource type="Script" uid="uid://dx0mnikg5y36l" path="res://world/world_simulation.gd" id="3_vekve"]
 [ext_resource type="Script" uid="uid://c8s7xp4da3mgf" path="res://core/input_manager.gd" id="4_vekve"]
+[ext_resource type="PackedScene" uid="uid://swtfucmv1dl8" path="res://core/player.tscn" id="5_xpqyo"]
 
 [sub_resource type="Sky" id="Sky_k2v8w"]
 
@@ -11,8 +12,6 @@
 background_mode = 2
 sky = SubResource("Sky_k2v8w")
 ambient_light_color = Color(0.6771736, 0.6771736, 0.6771737, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_73fdw"]
 
 [node name="ExperimentalStation" type="Node3D" unique_id=2072741116]
 
@@ -45,10 +44,10 @@ script = ExtResource("3_vekve")
 camera = NodePath("../IsometricCamera3D")
 grid = NodePath("../GridMap")
 
-[node name="CSGMesh3D" type="CSGMesh3D" parent="." unique_id=406301696]
-use_collision = true
-mesh = SubResource("BoxMesh_73fdw")
-
-[node name="InputManager" type="Node" parent="." unique_id=602915657 node_paths=PackedStringArray("world_simulation")]
+[node name="InputManager" type="Node" parent="." unique_id=602915657 node_paths=PackedStringArray("world_simulation", "player", "camera")]
 script = ExtResource("4_vekve")
 world_simulation = NodePath("../WorldSimulation")
+player = NodePath("../Player")
+camera = NodePath("../IsometricCamera3D")
+
+[node name="Player" parent="." unique_id=1099819557 instance=ExtResource("5_xpqyo")]
