@@ -7,5 +7,9 @@ func _init() -> void:
 	max_dist = 8.0
 
 
-func _on_cast(_target: Vector3) -> void:
-	pass # TODO: apply heat/burning at target position
+func _on_cast(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
+	var adj = StatAdjustment.new()
+	adj.source = "debug" + str(Time.get_ticks_msec())
+	adj.adjustment_type = "value" # we adjust the value directly
+	adj.adjustment_value = 1.0
+	world_simulation.add_effect(cell_index, adj)

@@ -3,8 +3,8 @@ extends Character
 
 @export var move_speed: float = 5.0
 @export var acceleration: float = 15.0
-
-const SPELL_ACTIONS := ["spell1", "spell2", "spell3"]
+@export var device_id: int = -1
+@export var level: Level
 
 var _move_dir: Vector3 = Vector3.ZERO
 var _last_move_dir: Vector3 = Vector3.FORWARD
@@ -16,13 +16,12 @@ var _active_spell: Spell = null
 
 
 func _ready() -> void:
-	_spells.resize(SPELL_ACTIONS.size())
+	_spells.resize(3)
 	assign_spell(0, ThermalBloom.new())
 
 
 func assign_spell(slot: int, spell: Spell) -> void:
 	_spells[slot] = spell
-	spell.action = SPELL_ACTIONS[slot]
 	spell.marker = _spell_marker
 
 
@@ -34,6 +33,26 @@ func set_move_input(dir: Vector3) -> void:
 
 func request_jump() -> void:
 	_jump_requested = true
+
+
+func request_spell(slot: int) -> void:
+	if _active_spell != null or slot >= _spells.size():
+		return
+	var spell := _spells[slot]
+	if spell != null:
+		spell.activate_marker(global_position, _last_move_dir)
+		_active_spell = spell
+
+
+func release_spell(slot: int) -> void:
+	if slot >= _spells.size():
+		return
+	var spell := _spells[slot]
+	if spell != null and spell == _active_spell:
+		var grid := level.world_simulation.grid
+		var index = grid.local_to_map(grid.to_local(_spell_marker.global_position))
+		spell.deactivate_marker(level.world_simulation, index)
+		_active_spell = null
 
 
 func _physics_process(delta: float) -> void:
@@ -54,12 +73,6 @@ func _physics_process(delta: float) -> void:
 
 
 func _process_spells(delta: float) -> void:
-	if _active_spell == null:
-		for spell in _spells:
-			if spell != null and spell.try_activate(global_position, _last_move_dir):
-				_active_spell = spell
-				break
-
 	if _active_spell != null:
 		_active_spell.process(delta, global_position, _last_move_dir)
 		if not _active_spell.is_active:

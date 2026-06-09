@@ -77,6 +77,13 @@ func add_effect(index: Vector3i, adj: StatAdjustment) -> void:
 
 
 ##
+func get_cell(index: Vector3i) -> GridCell:
+	if index in _cells:
+		return _cells[index]
+	return null
+
+
+##
 func get_grid_index(pos: Vector2) -> Vector3i:
 	var target = Helper3D.get_object_at(camera, pos)
 	if target:
