@@ -16,7 +16,7 @@ ambient_light_color = Color(0.6771736, 0.6771736, 0.6771737, 1)
 
 [node name="ExperimentalStation" type="Node3D" unique_id=2072741116 node_paths=PackedStringArray("players", "grid", "world_simulation")]
 script = ExtResource("1_bp11k")
-players = [NodePath("Player1")]
+players = [NodePath("Player1"), NodePath("Player2")]
 grid = NodePath("GridMap")
 world_simulation = NodePath("WorldSimulation")
 
@@ -57,4 +57,9 @@ camera = NodePath("../IsometricCamera3D")
 
 [node name="Player1" parent="." unique_id=1099819557 node_paths=PackedStringArray("level") instance=ExtResource("5_xpqyo")]
 device_id = 0
+level = NodePath("..")
+
+[node name="Player2" parent="." unique_id=959764023 node_paths=PackedStringArray("level") instance=ExtResource("5_xpqyo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1430664, 0, 0)
+device_id = 1
 level = NodePath("..")

@@ -13,6 +13,7 @@ var _spells: Array[Spell] = []
 var _active_spell: Spell = null
 
 @onready var _spell_marker: Node3D = $SpellMarker
+@onready var mesh: MeshInstance3D = $MeshInstance3D
 
 
 func _ready() -> void:
@@ -23,6 +24,12 @@ func _ready() -> void:
 func assign_spell(slot: int, spell: Spell) -> void:
 	_spells[slot] = spell
 	spell.marker = _spell_marker
+
+
+func set_player_color(color: Color) -> void:
+	if not mesh.material_override:
+		mesh.material_override = StandardMaterial3D.new()
+	mesh.material_override.albedo_color = color
 
 
 func set_move_input(dir: Vector3) -> void:
