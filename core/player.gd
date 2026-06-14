@@ -1,19 +1,15 @@
 class_name Player
 extends Character
 
-@export var move_speed: float = 5.0
-@export var acceleration: float = 15.0
 @export var device_id: int = -1
 @export var level: Level
 
-var _move_dir: Vector3 = Vector3.ZERO
-var _last_move_dir: Vector3 = Vector3.FORWARD
-var _jump_requested: bool = false
 var _spells: Array[Spell] = []
 var _active_spell: Spell = null
 
-@onready var _spell_marker: Node3D = $SpellMarker
+@onready var _spell_marker: SpellMarker = $SpellMarker
 @onready var mesh: MeshInstance3D = $MeshInstance3D
+@onready var _controller: PlayerController = $PlayerController
 
 
 func _ready() -> void:
@@ -30,16 +26,15 @@ func set_player_color(color: Color) -> void:
 	if not mesh.material_override:
 		mesh.material_override = StandardMaterial3D.new()
 	mesh.material_override.albedo_color = color
+	_spell_marker.set_color(color)
 
 
 func set_move_input(dir: Vector3) -> void:
-	_move_dir = dir
-	if dir != Vector3.ZERO:
-		_last_move_dir = dir.normalized()
+	_controller.set_move_input(dir)
 
 
 func request_jump() -> void:
-	_jump_requested = true
+	_controller.request_jump()
 
 
 func request_spell(slot: int) -> void:
@@ -47,7 +42,7 @@ func request_spell(slot: int) -> void:
 		return
 	var spell := _spells[slot]
 	if spell != null:
-		spell.activate_marker(global_position, _last_move_dir)
+		spell.activate_marker(global_position, _controller.get_facing_dir())
 		_active_spell = spell
 
 
@@ -65,22 +60,12 @@ func release_spell(slot: int) -> void:
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		apply_gravity(delta)
-
-	if _jump_requested and is_on_floor():
-		try_jump()
-	_jump_requested = false
-
-	var target := _move_dir * move_speed
-	velocity.x = move_toward(velocity.x, target.x, acceleration * delta)
-	velocity.z = move_toward(velocity.z, target.z, acceleration * delta)
-
-	move_and_slide()
-
+	_controller.physics_process(delta, _active_spell != null)
 	_process_spells(delta)
 
 
 func _process_spells(delta: float) -> void:
 	if _active_spell != null:
-		_active_spell.process(delta, global_position, _last_move_dir)
+		_active_spell.process(delta, global_position, _controller.get_facing_dir())
 		if not _active_spell.is_active:
 			_active_spell = null

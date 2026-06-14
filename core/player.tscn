@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://cmup3e5ugasbv" path="res://core/player.gd" id="1_3x74s"]
 [ext_resource type="PackedScene" uid="uid://bxq1galmnqwox" path="res://ui/spell_marker.tscn" id="2_ptdtg"]
+[ext_resource type="Script" uid="uid://c6iussano2i5t" path="res://core/player_controller.gd" id="3_pctrl"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_3x74s"]
-radius = 0.25
-height = 1.0
+[sub_resource type="PrismMesh" id="PrismMesh_ptdtg"]
+size = Vector3(0.4, 0.5, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u2d7q"]
 radius = 0.25
@@ -16,9 +16,9 @@ collision_layer = 2
 collision_mask = 255
 script = ExtResource("1_3x74s")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=498907484]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("CapsuleMesh_3x74s")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=163003687]
+transform = Transform3D(-1, 8.742277e-08, 3.8213705e-15, 0, -4.3711385e-08, 0.99999994, 8.742278e-08, 0.99999994, 4.3711385e-08, 0, 0.5, 0)
+mesh = SubResource("PrismMesh_ptdtg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=680073561]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
@@ -26,3 +26,6 @@ shape = SubResource("CapsuleShape3D_u2d7q")
 
 [node name="SpellMarker" parent="." unique_id=713141183 instance=ExtResource("2_ptdtg")]
 visible = false
+
+[node name="PlayerController" type="Node" parent="." unique_id=1700519107]
+script = ExtResource("3_pctrl")
