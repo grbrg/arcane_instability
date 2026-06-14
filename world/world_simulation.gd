@@ -38,7 +38,7 @@ func _reset_grid():
 				if cell_index.z > 0:
 					subst = SubstanceRegistry.get_substance("gras")
 				else:
-					subst = SubstanceRegistry.get_substance("copper")
+					subst = SubstanceRegistry.get_substance("kindling")
 
 			var new_cell = GridCell.new(cell_index, grid, subst)
 			new_cell.ambient = _ambient
