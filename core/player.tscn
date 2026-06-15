@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cmup3e5ugasbv" path="res://core/player.gd" id="1_3x74s"]
 [ext_resource type="PackedScene" uid="uid://bxq1galmnqwox" path="res://ui/spell_marker.tscn" id="2_ptdtg"]
-[ext_resource type="Script" path="res://core/face_buttons_player_controller.gd" id="3_pctrl"]
+[ext_resource type="Script" uid="uid://bwy343hggco5k" path="res://core/face_buttons_player_controller.gd" id="3_pctrl"]
+[ext_resource type="Script" uid="uid://cx4yqu7q8rgl0" path="res://core/twinstick_player_controller.gd" id="4_y0177"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_ptdtg"]
 size = Vector3(0.4, 0.5, 1)
@@ -27,5 +28,10 @@ shape = SubResource("CapsuleShape3D_u2d7q")
 [node name="SpellMarker" parent="." unique_id=713141183 instance=ExtResource("2_ptdtg")]
 visible = false
 
-[node name="PlayerController" type="Node" parent="." unique_id=102837915]
+[node name="PlayerController_" type="Node" parent="." unique_id=1849039131]
 script = ExtResource("3_pctrl")
+metadata/_custom_type_script = "uid://cx4yqu7q8rgl0"
+
+[node name="PlayerController" type="Node" parent="." unique_id=394948083]
+script = ExtResource("4_y0177")
+metadata/_custom_type_script = "uid://cx4yqu7q8rgl0"

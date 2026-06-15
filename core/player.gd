@@ -11,6 +11,8 @@ var _active_spell: Spell = null
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var _controller: PlayerController = $PlayerController
 
+
+
 func _ready() -> void:
 	_spells.resize(3)
 	assign_spell(0, ThermalBloom.new())
@@ -42,6 +44,11 @@ func poll_joypad(joypad_id: int, camera: Camera3D) -> void:
 
 func request_jump() -> void:
 	_controller.request_jump()
+
+
+func redirect_active_spell(dir: Vector3, magnitude: float = -1.0) -> void:
+	if _active_spell != null:
+		_active_spell.redirect(dir, magnitude)
 
 
 func request_spell(slot: int) -> void:

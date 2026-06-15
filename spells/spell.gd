@@ -16,14 +16,17 @@ var is_active: bool:
 var _active: bool = false
 var _dist: float = 0.0
 var _cast_dir: Vector3 = Vector3.FORWARD
+var _manual_dist: bool = false
 
 
 func activate_marker(origin: Vector3, dir: Vector3) -> void:
 	_active = true
 	_dist = 0.0
 	_cast_dir = dir
+	_manual_dist = false
 	marker.visible = true
 	marker.global_position = origin
+	marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
 func deactivate_marker(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
@@ -34,9 +37,20 @@ func deactivate_marker(world_simulation: WorldSimulation, cell_index: Vector3i) 
 	_on_cast(world_simulation, cell_index)
 
 
+func redirect(dir: Vector3, magnitude: float = -1.0) -> void:
+	if not _active or dir == Vector3.ZERO:
+		return
+	_cast_dir = dir
+	if magnitude >= 0.0:
+		_dist = magnitude * max_dist
+		_manual_dist = true
+
+
 func process(delta: float, origin: Vector3, _dir: Vector3) -> void:
-	_dist = minf(_dist + speed * delta, max_dist)
+	if not _manual_dist:
+		_dist = minf(_dist + speed * delta, max_dist)
 	marker.global_position = origin + _cast_dir * _dist
+	marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
 func _on_cast(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
