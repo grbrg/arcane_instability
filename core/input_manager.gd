@@ -1,20 +1,17 @@
 class_name InputManager
 extends Node
 
-# Joypad button indices for the three spell slots (Square, Circle, Triangle)
-const SPELL_BUTTONS := [JOY_BUTTON_X, JOY_BUTTON_B, JOY_BUTTON_Y]
-
 @export var world_simulation: WorldSimulation
 @export var level: Level
 @export var camera: Camera3D
-
 
 
 func _physics_process(_delta: float) -> void:
 	for player in level.players:
 		if not player:
 			continue
-		var input := _get_move_input(player.device_id)
+		var device_id := player.device_id
+		var input := _get_move_input(device_id)
 		var move_dir := Vector3.ZERO
 		if input != Vector2.ZERO and camera:
 			var basis := camera.global_transform.basis
@@ -22,6 +19,8 @@ func _physics_process(_delta: float) -> void:
 			var cam_right := Vector3(basis.x.x, 0.0, basis.x.z).normalized()
 			move_dir = (cam_right * input.x - cam_forward * input.y).normalized()
 		player.set_move_input(move_dir)
+		if device_id >= 0:
+			player.poll_joypad(device_id, camera)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -41,7 +40,7 @@ func _get_move_input(device_id: int) -> Vector2:
 		Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X),
 		Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	)
-	return raw if raw.length() > 0.2 else Vector2.ZERO
+	return raw if raw.length() > PlayerController.STICK_DEADZONE else Vector2.ZERO
 
 
 func _find_player_for_event(event: InputEvent) -> Player:
@@ -62,30 +61,15 @@ func _handle_player_input(event: InputEvent, player: Player) -> void:
 	if event is InputEventKey:
 		if event.is_action_pressed("jump"):
 			player.request_jump()
-		for i in SPELL_BUTTONS.size():
+		for i in 3:
 			if event.is_action_pressed("spell%d" % (i + 1)):
 				player.request_spell(i)
 			elif event.is_action_released("spell%d" % (i + 1)):
 				player.release_spell(i)
 	elif event is InputEventJoypadButton:
-		if event.is_pressed():
-			match event.button_index:
-				JOY_BUTTON_A:
-					player.request_jump()
-				JOY_BUTTON_X:
-					player.request_spell(0)
-				JOY_BUTTON_B:
-					player.request_spell(1)
-				JOY_BUTTON_Y:
-					player.request_spell(2)
-		else:
-			match event.button_index:
-				JOY_BUTTON_X:
-					player.release_spell(0)
-				JOY_BUTTON_B:
-					player.release_spell(1)
-				JOY_BUTTON_Y:
-					player.release_spell(2)
+		if event.is_pressed() and event.button_index == JOY_BUTTON_A:
+			player.request_jump()
+		player.handle_joypad_button(event)
 
 
 func _debug_input(event: InputEvent) -> void:

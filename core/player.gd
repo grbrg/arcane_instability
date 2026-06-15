@@ -11,7 +11,6 @@ var _active_spell: Spell = null
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var _controller: PlayerController = $PlayerController
 
-
 func _ready() -> void:
 	_spells.resize(3)
 	assign_spell(0, ThermalBloom.new())
@@ -31,6 +30,14 @@ func set_player_color(color: Color) -> void:
 
 func set_move_input(dir: Vector3) -> void:
 	_controller.set_move_input(dir)
+
+
+func handle_joypad_button(event: InputEventJoypadButton) -> void:
+	_controller.handle_joypad_button(event)
+
+
+func poll_joypad(joypad_id: int, camera: Camera3D) -> void:
+	_controller.poll_joypad(joypad_id, camera)
 
 
 func request_jump() -> void:
