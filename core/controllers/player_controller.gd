@@ -12,11 +12,11 @@ var _move_dir: Vector3 = Vector3.ZERO
 var _aim_dir: Vector3 = Vector3.ZERO
 var _last_move_dir: Vector3 = Vector3.FORWARD
 var _jump_requested: bool = false
-var _character: Character
+var _player: Player
 
 
-func _ready() -> void:
-	_character = get_parent() as Character
+func _init(_p: Player) -> void:
+	_player = _p
 
 
 func set_move_input(dir: Vector3) -> void:
@@ -48,20 +48,20 @@ func poll_joypad(_device_id: int, _camera: Camera3D) -> void:
 func physics_process(delta: float, has_active_spell: bool) -> void:
 	_handle_jump()
 	_apply_movement(delta)
-	_character.move_and_slide()
+	_player.move_and_slide()
 	_update_rotation(delta, has_active_spell)
 
 
 func _handle_jump() -> void:
 	if _jump_requested:
-		_character.try_jump()
+		_player.try_jump()
 	_jump_requested = false
 
 
 func _apply_movement(delta: float) -> void:
 	var target := _move_dir * move_speed
-	_character.velocity.x = move_toward(_character.velocity.x, target.x, acceleration * delta)
-	_character.velocity.z = move_toward(_character.velocity.z, target.z, acceleration * delta)
+	_player.velocity.x = move_toward(_player.velocity.x, target.x, acceleration * delta)
+	_player.velocity.z = move_toward(_player.velocity.z, target.z, acceleration * delta)
 
 
 func _update_rotation(delta: float, has_active_spell: bool) -> void:
@@ -72,4 +72,4 @@ func _update_rotation(delta: float, has_active_spell: bool) -> void:
 		target_dir = _move_dir
 	if target_dir != Vector3.ZERO:
 		_last_move_dir = _last_move_dir.lerp(target_dir.normalized(), turn_speed * delta).normalized()
-	_character.rotation.y = atan2(_last_move_dir.x, _last_move_dir.z)
+	_player.rotation.y = atan2(_last_move_dir.x, _last_move_dir.z)

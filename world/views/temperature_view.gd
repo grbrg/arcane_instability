@@ -9,19 +9,12 @@ var _magnification = 8.0
 
 
 func _ready() -> void:
-	pass
+	mesh.set_instance_shader_parameter("time_offset", randf() * 100.0)
 
 
 ## Sets the temperature from 0 to 1 (very hot)
 func set_temperature(temp: float) -> void:
-	var material := mesh.get_active_material(0) as StandardMaterial3D
-
-	if temp < 0:
-		material.albedo_color = Color(0.0, 0.0, 1.0)
-		material.albedo_color.a = abs(temp * _magnification)
-	else:
-		material.albedo_color = Color(1.0, 0.0, 0.0)
-		material.albedo_color.a = temp * _magnification
+	mesh.set_instance_shader_parameter("temperature", clampf(temp * _magnification, 0.0, 1.0))
 
 
 func update(ambient: Ambient) -> void:

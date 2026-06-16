@@ -1,20 +1,22 @@
 [gd_scene format=3 uid="uid://b6kuryhxb10qg"]
 
 [ext_resource type="Script" uid="uid://eiemxs2vlxvf" path="res://world/views/temperature_view.gd" id="1_t62g3"]
+[ext_resource type="Shader" uid="uid://dm0phgf3y6575" path="res://world/views/temperature_view.gdshader" id="2_ta4ye"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_lmbdb"]
-bottom_radius = 1.0
-height = 0.25
+[sub_resource type="BoxMesh" id="BoxMesh_t62g3"]
+subdivide_width = 8
+subdivide_height = 8
+subdivide_depth = 8
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t62g3"]
-resource_local_to_scene = true
-transparency = 1
-albedo_color = Color(1, 0, 0, 0.25490198)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8vtoy"]
+render_priority = 0
+shader = ExtResource("2_ta4ye")
 
 [node name="TemperatureView" type="Node3D" unique_id=1159365705]
 script = ExtResource("1_t62g3")
 metadata/_custom_type_script = "uid://eiemxs2vlxvf"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=247105221]
-mesh = SubResource("CylinderMesh_lmbdb")
-surface_material_override/0 = SubResource("StandardMaterial3D_t62g3")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_t62g3")
+surface_material_override/0 = SubResource("ShaderMaterial_8vtoy")

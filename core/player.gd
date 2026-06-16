@@ -6,16 +6,19 @@ extends Character
 
 var _spells: Array[Spell] = []
 var _active_spell: Spell = null
+var _controller: PlayerController
 
 @onready var _spell_marker: SpellMarker = $SpellMarker
 @onready var mesh: MeshInstance3D = $MeshInstance3D
-@onready var _controller: PlayerController = $PlayerController
+
 
 
 
 func _ready() -> void:
 	_spells.resize(3)
 	assign_spell(0, ThermalBloom.new())
+
+	_controller = TwinstickPlayerController.new(self)
 
 
 func assign_spell(slot: int, spell: Spell) -> void:

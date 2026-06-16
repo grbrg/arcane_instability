@@ -8,3 +8,9 @@ extends Node3D
 
 @export var world_simulation: WorldSimulation
 
+@export var camera: IsometricCamera3D
+
+
+
+func _ready() -> void:
+	camera.follow_targets = players

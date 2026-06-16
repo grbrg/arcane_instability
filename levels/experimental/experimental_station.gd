@@ -7,6 +7,8 @@ var _colors = [Color.DARK_GREEN, Color.INDIAN_RED, Color.SKY_BLUE, Color.DEEP_PI
 
 
 func _ready() -> void:
+	super._ready()
+	
 	var i = 0
 	for player in players:		
 		player.set_player_color(_colors[i])
