@@ -7,7 +7,7 @@ extends Camera3D
 @export var max_height: float
 @export var zoom_speed = 2.0
 @export var move_speed = 20
-@export var follow_targets: Array[Node3D]
+@export var follow_targets: Array[Player]
 
 # offset of the camera, if following a specific node
 const _follow_target_offset: Vector3 = Vector3(0, 20, -10)
@@ -22,11 +22,20 @@ var _velocity: Vector3
 ##
 func _process(delta):
 	if len(follow_targets) > 0:
-		var new_pos = Vector3.ZERO
+		var centroid = Vector3.ZERO
 		for target in follow_targets:
-			new_pos += target.global_position
-		new_pos /= len(follow_targets)
-		global_position = new_pos + _follow_target_offset
+			centroid += target.global_position
+		centroid /= len(follow_targets)
+
+		# Step backward along the camera's forward ray so centroid lands at
+		# the center of the viewport, keeping the camera _follow_target_offset.y
+		# units above the centroid regardless of the camera's yaw/pitch.
+		var cam_fwd := -global_basis.z
+		if abs(cam_fwd.y) > 0.001:
+			var t := -_follow_target_offset.y / cam_fwd.y
+			global_position = centroid - t * cam_fwd
+		else:
+			global_position = centroid + _follow_target_offset
 	
 	else:
 		# dampen any scrolling we might have
