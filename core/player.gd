@@ -18,7 +18,7 @@ func _ready() -> void:
 	_spells.resize(3)
 	assign_spell(0, ThermalBloom.new())
 
-	_controller = TwinstickPlayerController.new(self)
+	_controller = WorldCursorPlayerController.new(self)
 
 
 func assign_spell(slot: int, spell: Spell) -> void:
@@ -52,6 +52,20 @@ func request_jump() -> void:
 func redirect_active_spell(dir: Vector3, magnitude: float = -1.0) -> void:
 	if _active_spell != null:
 		_active_spell.redirect(dir, magnitude)
+
+
+func set_spell_marker_position(world_pos: Vector3) -> void:
+	_spell_marker.global_position = world_pos
+	if _active_spell != null:
+		var to := world_pos - global_position
+		if to.length() > 0.001:
+			_active_spell.redirect(to.normalized(), to.length() / _active_spell.max_dist)
+		else:
+			_active_spell.redirect(_controller.get_facing_dir(), 0.0)
+
+
+func set_spell_marker_visible(marker_visible: bool) -> void:
+	_spell_marker.visible = marker_visible
 
 
 func request_spell(slot: int) -> void:

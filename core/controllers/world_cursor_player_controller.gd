@@ -1,0 +1,77 @@
+class_name WorldCursorPlayerController
+extends PlayerController
+
+@export var cursor_speed: float = 8.0
+
+var _cursor_pos: Vector3 = Vector3.ZERO
+var _following_player: bool = true
+var _raw_stick: Vector2 = Vector2.ZERO
+var _camera: Camera3D = null
+var _has_active_spell: bool = false
+
+var _l1_pressed := false
+var _r1_pressed := false
+var _r2_pressed := false
+
+
+func handle_joypad_button(event: InputEventJoypadButton) -> void:
+	if event.is_pressed():
+		match event.button_index:
+			JOY_BUTTON_RIGHT_STICK: _following_player = true
+
+
+func poll_joypad(device_id: int, camera: Camera3D) -> void:
+	_raw_stick = Vector2(
+		Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_X),
+		Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_Y)
+	)
+	_camera = camera
+	_update_spell_inputs(device_id)
+
+
+func physics_process(delta: float, has_active_spell: bool) -> void:
+	_has_active_spell = has_active_spell
+	_update_cursor(delta)
+	super.physics_process(delta, has_active_spell)
+	# Re-pin marker after move_and_slide() has moved the player (and drifted the child node)
+	_cursor_pos.y = _player.global_position.y
+	_player.set_spell_marker_position(_cursor_pos)
+
+
+func _update_cursor(delta: float) -> void:
+	if _raw_stick.length() > STICK_DEADZONE and _camera != null:
+		_following_player = false
+		var basis := _camera.global_transform.basis
+		var cam_forward := -Vector3(basis.z.x, 0.0, basis.z.z).normalized()
+		var cam_right := Vector3(basis.x.x, 0.0, basis.x.z).normalized()
+		var move_dir := (cam_right * _raw_stick.x - cam_forward * _raw_stick.y).normalized()
+		_cursor_pos += move_dir * cursor_speed * delta
+	elif _following_player:
+		_cursor_pos = _player.global_position
+
+	_cursor_pos.y = _player.global_position.y
+
+	var to_cursor := _cursor_pos - _player.global_position
+	var displaced := to_cursor.length() > 0.5
+	_player.set_spell_marker_visible(displaced or _has_active_spell)
+	set_aim_input(to_cursor.normalized() if displaced else Vector3.ZERO)
+
+
+func _update_spell_inputs(device_id: int) -> void:
+	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
+	var r1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_RIGHT_SHOULDER)
+	var r2 := Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) > TRIGGER_DEADZONE
+
+	if l1 != _l1_pressed:
+		if l1: _player.request_spell(1)
+		else: _player.release_spell(1)
+	if r1 != _r1_pressed:
+		if r1: _player.request_spell(0)
+		else: _player.release_spell(0)
+	if r2 != _r2_pressed:
+		if r2: _player.request_spell(2)
+		else: _player.release_spell(2)
+
+	_l1_pressed = l1
+	_r1_pressed = r1
+	_r2_pressed = r2
