@@ -11,17 +11,15 @@ void vertex() {
 }
 
 void fragment() {
-	float distortion = temperature * 0.025;
+	float distortion = temperature * 0.007;
 	float t = TIME + time_offset;
 
 	float nx = sin(UV.y * 15.0 + t * 5.0)
-	         + sin(UV.y * 31.0 + t * 8.6 + UV.x * 8.0) * 0.5
-	         + sin(UV.y * 52.0 + t * 14.2 + UV.x * 17.0) * 0.25;
-	float ny = cos(UV.x * 13.0 + t * 3.8)
-	         + cos(UV.x * 27.0 + t * 7.4 + UV.y * 6.0) * 0.5;
+	         + sin(UV.y * 31.0 + t * 8.6 + UV.x * 8.0) * 0.3;
+	float ny = cos(UV.x * 13.0 + t * 3.8) * 0.4;
 
 	vec4 distorted = texture(SCREEN_TEXTURE, SCREEN_UV + vec2(nx, ny) * distortion);
 
-	ALBEDO = mix(distorted.rgb, vec3(1.0, 0.1, 0.05), temperature * 0.25);
-	ALPHA = temperature;
+	ALBEDO = mix(distorted.rgb, vec3(1.0, 0.1, 0.05), temperature * 0.15);
+	ALPHA = temperature * 0.5;
 }
