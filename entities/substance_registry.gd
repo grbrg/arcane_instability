@@ -29,7 +29,7 @@ func _init() -> void:
 	gras.thermal_capacity = 0.25
 	gras.thermal_conductivity = 0.2
 	gras.burning_temperature = 0.2
-	_substances["gras"] = gras
+	_substances["grass"] = gras
 
 	# Requires two thermal_bloom hits within ~1-2 seconds to ignite.
 	# entity.tick() decays heat before check_activation runs, so decay and

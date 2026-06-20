@@ -31,14 +31,14 @@ func _reset_grid():
 
 		# first add all cells
 		for cell_index in cell_indices:
-			var subst = null
+			var subst = ""
 			if cell_index.x > 0:
-				subst = SubstanceRegistry.get_substance("water")
+				subst = "water"
 			else:
 				if cell_index.z > 0:
-					subst = SubstanceRegistry.get_substance("gras")
+					subst = "grass"
 				else:
-					subst = SubstanceRegistry.get_substance("kindling")
+					subst = "kindling"
 
 			var new_cell = GridCell.new(cell_index, grid, subst)
 			new_cell.ambient = _ambient

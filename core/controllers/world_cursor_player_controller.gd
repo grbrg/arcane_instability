@@ -1,7 +1,8 @@
 class_name WorldCursorPlayerController
 extends PlayerController
 
-@export var cursor_speed: float = 8.0
+@export var cursor_speed: float = 6.0
+@export var max_cursor_distance: float = 6.0
 
 var _cursor_pos: Vector3 = Vector3.ZERO
 var _following_player: bool = true
@@ -39,7 +40,9 @@ func physics_process(delta: float, has_active_spell: bool) -> void:
 
 
 func _update_cursor(delta: float) -> void:
-	if _raw_stick.length() > STICK_DEADZONE and _camera != null:
+	var stick_active := _raw_stick.length() > STICK_DEADZONE and _camera != null
+
+	if stick_active:
 		_following_player = false
 		var basis := _camera.global_transform.basis
 		var cam_forward := -Vector3(basis.z.x, 0.0, basis.z.z).normalized()
@@ -52,6 +55,15 @@ func _update_cursor(delta: float) -> void:
 	_cursor_pos.y = _player.global_position.y
 
 	var to_cursor := _cursor_pos - _player.global_position
+	if to_cursor.length() > max_cursor_distance:
+		if stick_active:
+			to_cursor = to_cursor.normalized() * max_cursor_distance
+			_cursor_pos = _player.global_position + to_cursor
+		else:
+			_cursor_pos = _player.global_position
+			_following_player = true
+			to_cursor = Vector3.ZERO
+
 	var displaced := to_cursor.length() > 0.5
 	_player.set_spell_marker_visible(displaced or _has_active_spell)
 	set_aim_input(to_cursor.normalized() if displaced else Vector3.ZERO)

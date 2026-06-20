@@ -2,15 +2,19 @@ class_name GridCell
 extends Node
 
 
+
 var grid: GridMap
 var index: Vector3i
 var neighbours: Array[GridCell] = []
 
 var entity: Entity
 
+var _ground: Ground
+
 #
 var _property_views = {} #: Array[EntityPropertyView]
 
+var _subst_type: String
 var substance: Substance
 
 var ambient: Ambient
@@ -21,11 +25,24 @@ var sub_entities: Array[Entity]
 var conditions: Array[Condition]
 
 
-func _init(idx: Vector3i, _grid: GridMap, _subst: Substance) -> void:
+##
+func _init(idx: Vector3i, _grid: GridMap, _subst: String) -> void:
 	index = idx
 	grid = _grid
+	_subst_type = _subst
 
-	substance = _subst
+	substance = SubstanceRegistry.get_substance(_subst_type)
+
+	if _subst == "grass":
+		_ground = ResourceManager.grass_scene.instantiate()
+	else:
+		_ground = ResourceManager.ground_scene.instantiate()
+	_ground.set_substance(_subst_type)
+	add_child(_ground)
+	_ground.position = grid.local_to_map(index)
+	_ground.position.y = 0.0
+	#Log.d("%s -> %d" % [str(index), _ground.position.y])
+	
 
 	entity = Entity.new(substance)
 	entity.property_diffusion.connect(on_property_diffusion)

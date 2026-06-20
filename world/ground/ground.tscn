@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cgeb8fvwbucyj"]
+
+[ext_resource type="Script" uid="uid://cb6ewmwkcnds7" path="res://world/ground/ground.gd" id="1_7c0ko"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7c0ko"]
+size = Vector2(1, 1)
+
+[node name="Ground" type="Node3D" unique_id=1061836417]
+script = ExtResource("1_7c0ko")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1955270306]
+mesh = SubResource("PlaneMesh_7c0ko")
