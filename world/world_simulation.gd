@@ -8,6 +8,8 @@ const TICK_TIME = 1.0
 @export var camera: Camera3D
 @export var grid: GridMap
 
+var _spell_to_be_resolved: Array[Spell]
+
 
 var _cells = {}
 
@@ -69,6 +71,11 @@ func _process(delta: float) -> void:
 		_time_since_tick = 0.0
 
 
+func add_spell_to_be_resolved(spell: Spell):
+	if not spell in _spell_to_be_resolved:
+		_spell_to_be_resolved.append(spell)
+
+
 func add_effect(index: Vector3i, adj: StatAdjustment) -> void:
 	if index in _cells:
 		var cell = _cells[index]
@@ -95,9 +102,25 @@ func get_grid_index(pos: Vector2) -> Vector3i:
 
 ##
 func _tick(delta: float) -> void:
+	# Step 1: resolve spells first
+	for spell in _spell_to_be_resolved:
+		spell.resolve(self)
 
-	# Update each cell's entities
+	# Step 2: Update each cell's entities
 	# e. g. temperature slowly goes to down/up
 	for index in _cells:
 		var cell = _cells[index]
 		cell.tick(delta)
+	
+	# Step 3: Transfer to neighbours
+
+	# Step 4: Check substance reactions
+
+	# Step 5: Create new states
+
+	# Step 6: Calculate damage
+
+	# Step 7: Reduce HP
+
+	# Step 8: Decay
+	

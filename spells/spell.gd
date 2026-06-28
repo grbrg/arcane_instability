@@ -18,6 +18,9 @@ var _dist: float = 0.0
 var _cast_dir: Vector3 = Vector3.FORWARD
 var _manual_dist: bool = false
 
+# where the spells resolves
+var _resolve_cell: Vector3i
+
 
 func activate_marker(origin: Vector3, dir: Vector3) -> void:
 	_active = true
@@ -53,5 +56,12 @@ func process(delta: float, origin: Vector3, _dir: Vector3) -> void:
 	marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
+##
 func _on_cast(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
+	_resolve_cell = cell_index
+	world_simulation.add_spell_to_be_resolved(self)
+
+
+## To be overwritten
+func resolve(world_simulation: WorldSimulation) -> void:
 	pass

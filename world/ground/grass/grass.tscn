@@ -20,6 +20,7 @@ buffer = PackedFloat32Array(0, 0, -0.251, 0.38507104, 0, 0.251, 0, 0, 0.251, 0, 
 script = ExtResource("1_76fpe")
 
 [node name="Plane" type="MeshInstance3D" parent="." unique_id=2034052522]
+visible = false
 mesh = SubResource("PlaneMesh_76fpe")
 
 [node name="Grass" type="MultiMeshInstance3D" parent="." unique_id=2019476040]
