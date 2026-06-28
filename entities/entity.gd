@@ -17,49 +17,13 @@ var properties = {}
 
 
 
-## WIP: will be removed:
-
-var movability: EntityProperty
-
-var pressure: EntityProperty
-
-## Influences the spread of the other values (randomness)
-## high stability means a very small spread of the value (e. g. damage 9-11)
-## low stability means a very large spread of the values (e. g. damage 2-40)
-var stability: EntityProperty
-
-## How hard is the enitity
-## low hardness means it can be deformed
-var hardness: EntityProperty
-
-## How the entity interacts mechanically
-## - high friction means movement with other (player, objects) is limited
-## - low friction means other slide over/by the entity
-var friction: EntityProperty
-
-var absorption: EntityProperty
-
-## How the entity reacts to metals
-## <0 ... repulses metals
-## 0 ... no magnetism
-## >0 ... attracts metals
-var magnetism: EntityProperty
-
-## How visible is the entity
-var observability: EntityProperty
-
-var impulse: Vector3
-
-var mass: EntityProperty
-
-
-
-
 ##
 func _init(subst: Substance) -> void:
 	substance = subst
 
 	properties = substance.create_properties()
+	for key in properties:
+		properties[key].property_value_changed.connect(on_property_value_changed)
 
 
 ##
@@ -77,8 +41,10 @@ func get_active_conditions() -> Array[Condition]:
 
 ##
 func on_property_value_changed(source: EntityProperty) -> void:
-	if source is ThermalEnergy:
-		property_diffusion.emit("thermal")
+	for key in properties:
+		if properties[key] == source:
+			property_diffusion.emit(key)
+			return
 
 
 ##
