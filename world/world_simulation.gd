@@ -8,7 +8,7 @@ const TICK_TIME = 1.0
 @export var camera: Camera3D
 @export var grid: GridMap
 
-var _spell_to_be_resolved: Array[Spell]
+var _casts_to_resolve: Array[Cast]
 
 var _cells = {}
 
@@ -104,16 +104,16 @@ func _update_character_cells() -> void:
 		_character_cells[character] = new_index
 
 
-func add_spell_to_be_resolved(spell: Spell):
-	if not spell in _spell_to_be_resolved:
-		_spell_to_be_resolved.append(spell)
+func add_cast_to_resolve(cast: Cast) -> void:
+	if not cast in _casts_to_resolve:
+		_casts_to_resolve.append(cast)
 
 
-func add_effect(index: Vector3i, adj: StatAdjustment) -> void:
+func add_effect(index: Vector3i, type: String, adj: StatAdjustment) -> void:
 	if index in _cells:
 		var cell = _cells[index]
 		if cell:
-			cell.add_effect("thermal", adj)
+			cell.add_effect(type, adj)
 
 
 ##
@@ -144,8 +144,9 @@ func _tick(delta: float) -> void:
 	# 	Step 7: Reduce HP
 	# 	Step 8: Decay
 
-	for spell in _spell_to_be_resolved:
-		spell.resolve(self)
+	for cast in _casts_to_resolve:
+		cast.resolve(self)
+	_casts_to_resolve.clear()
 
 	for index in _cells:
 		var cell = _cells[index]

@@ -31,7 +31,7 @@ Die Simulation arbeitet ausschließlich lokal auf benachbarten Grid-Zellen.
 Simulationsablauf:
 
 ```
-Zauber
+Modul-Konfiguration
     ↓
 Zustände verändern
     ↓
@@ -50,9 +50,9 @@ Die Steuerung erfolgt per Controller:
 
 * Linker Stick → Bewegung
 * Rechter Stick → Cursor
-* Vier Schultertasten manipulieren direkt die vier Zustandsachsen.
+* Vier Schultertasten feuern je eine Modul-Konfiguration ab.
 
-Runen und Upgrades verändern ausschließlich die Form der Anwendung (Strahl, Projektil, Aura, Kegel usw.), nicht die zugrunde liegenden Systeme.
+Der Spieler sammelt keine fertigen Zauber, sondern **Module**. Vor oder während eines Runs ordnet er diese Module den vier Schultertasten zu. Für den Spieler wirkt jede Taste wie ein eigener Zauber – intern ist es nur eine Konfiguration derselben Simulationsbausteine.
 
 Das Designziel ist ein **einfach implementierbares, konsistentes und datengetriebenes Simulationssystem**, in dem neue Zauber, Materialien oder Energiekanäle automatisch neue Interaktionen ermöglichen.
 
@@ -198,42 +198,61 @@ Materialien besitzen keine Speziallogik.
 
 ---
 
-# Zauber
+# Module
 
-Zauber manipulieren ausschließlich Zustände.
+Der Spieler sammelt keine fertigen Zauber, sondern Module. Module sind in drei Kategorien unterteilt.
 
-## Feuerstrahl
+## Energiekanäle
 
-```text
-+40 ThermalEnergy
-```
-
-## Blitz
+Bestimmen, welcher Zustand verändert wird.
 
 ```text
-+40 ElectricalEnergy
+Thermisch   → +ThermalEnergy
+Elektrisch  → +ElectricalEnergy
+Arkan       → +ArcaneEnergy
 ```
 
-## Arkanstoß
+Neue Kanäle können ergänzt werden, ohne den Simulationskern zu ändern.
+
+## Formen
+
+Bestimmen, wie und wo der Zustand angewendet wird.
 
 ```text
-+40 ArcaneEnergy
+Strahl      → kontinuierlicher Beam in Cursorrichtung
+Projektil   → bewegtes Objekt, das Zustände bei Treffer überträgt
+Aura        → Zustand um den Spieler herum
+Mine        → platziertes Objekt, löst bei Kontakt aus
+Kegel       → breiter Nahbereichskegel
 ```
 
-## Druckwelle
+## Modifikatoren
+
+Verändern Eigenschaften der Anwendung.
 
 ```text
-+60 Impulse
+Größer      → erhöhter Radius / Fläche
+Schneller   → höhere Projektilgeschwindigkeit / kürzere Wirkzeit
+Springt     → Wirkung prallt auf Nachbarzellen ab
+Durchdringt → Projektil passiert Entities ohne zu stoppen
+Explodiert  → Flächenwirkung bei Aufprall
 ```
 
-## Kristallisieren
+Module kennen keine Materialien. Die Zustandsänderung entsteht intern aus der Kombination.
+
+## Konfiguration
+
+Vor oder während eines Runs weist der Spieler den vier Schultertasten je eine Kombination aus Modulen zu:
 
 ```text
-+30 Structure
--20 ThermalEnergy
+Taste   Energiekanal   Form      Modifikator
+R2      Thermisch      Strahl    —
+R1      Impuls         Welle     —
+L2      Struktur       Wand      —
+L1      Elektrisch     Kette     —
 ```
 
-Zauber kennen keine Materialien.
+Für den Spieler sind das vier Zauber. Intern ist jede Taste nur eine Konfiguration derselben Simulationsbausteine.
 
 ---
 
@@ -367,31 +386,32 @@ Rechter Stick
 
 → Cursor
 
-Vier Schultertasten manipulieren direkt die vier Zustandsachsen.
+Vier Schultertasten feuern je eine Modul-Konfiguration ab.
 
 ```text
-R2 → Energie
-R1 → Impuls
-L2 → Struktur
-L1 → Leitung
+R2 → Modul-Konfiguration A
+R1 → Modul-Konfiguration B
+L2 → Modul-Konfiguration C
+L1 → Modul-Konfiguration D
 ```
 
-Runen und Upgrades verändern ausschließlich:
+Beispielkonfiguration:
 
-* Form (Strahl, Projektil, Aura, Mine, Kegel ...)
-* Radius
-* Stärke
-* Dauer
-* Reichweite
+```text
+R2   Thermisch  + Strahl
+R1   Impuls     + Welle
+L2   Struktur   + Wand
+L1   Elektrisch + Kette
+```
 
-Die zugrunde liegende Funktion bleibt unverändert.
+Modifikatoren (Größer, Schneller, Springt, Durchdringt, Explodiert) können einer Konfiguration hinzugefügt werden und verändern ausschließlich die Anwendungseigenschaften. Die zugrunde liegende Simulationslogik bleibt unverändert.
 
 ---
 
 # Simulations-Loop
 
 ```text
-1. Zauber anwenden
+1. Modul-Konfiguration anwenden (Zustände setzen)
 
 2. Zustände aktualisieren
 
@@ -414,8 +434,10 @@ Die zugrunde liegende Funktion bleibt unverändert.
 
 * Nur vier universelle Zustandsachsen.
 * Energie besteht aus beliebig vielen Energiekanälen mit identischer Simulationslogik.
-* Zauber manipulieren ausschließlich Zustände.
+* Der Spieler sammelt Module, keine Zauber.
+* Module kombinieren Energiekanal, Form und optionale Modifikatoren.
+* Jede Schultertaste ist eine Modul-Konfiguration – für den Spieler ein Zauber, intern eine Datenkombination.
 * Materialien definieren ausschließlich Konstanten.
 * Alle Reaktionen sind generisch und datengetrieben.
 * Schaden ist eine Folge der Simulation und kein direkter Zaubereffekt.
-* Neue Zauber, Materialien und Energiekanäle integrieren sich automatisch in das bestehende System, ohne zusätzliche Speziallogik.
+* Neue Module, Materialien und Energiekanäle integrieren sich automatisch in das bestehende System, ohne zusätzliche Speziallogik.

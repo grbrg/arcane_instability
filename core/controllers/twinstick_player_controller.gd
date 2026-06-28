@@ -2,13 +2,14 @@ class_name TwinstickPlayerController
 extends PlayerController
 
 var _l1_pressed := false
+var _l2_pressed := false
 var _r1_pressed := false
 var _r2_pressed := false
 
 
 func poll_joypad(device_id: int, camera: Camera3D) -> void:
 	_update_aim(device_id, camera)
-	_update_spell_inputs(device_id)
+	_update_cast_inputs(device_id)
 
 
 func _update_aim(device_id: int, camera: Camera3D) -> void:
@@ -26,24 +27,29 @@ func _update_aim(device_id: int, camera: Camera3D) -> void:
 		magnitude = clampf((raw.length() - STICK_DEADZONE) / (1.0 - STICK_DEADZONE), 0.0, 1.0)
 	set_aim_input(aim_dir)
 	if aim_dir != Vector3.ZERO:
-		_player.redirect_active_spell(aim_dir, magnitude)
+		_player.redirect_active_cast(aim_dir, magnitude)
 
 
-func _update_spell_inputs(device_id: int) -> void:
-	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
-	var r1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_RIGHT_SHOULDER)
+func _update_cast_inputs(device_id: int) -> void:
 	var r2 := Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) > TRIGGER_DEADZONE
+	var r1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_RIGHT_SHOULDER)
+	var l2 := Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_LEFT) > TRIGGER_DEADZONE
+	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
 
-	if l1 != _l1_pressed:
-		if l1: _player.request_spell(1)
-		else: _player.release_spell(1)
-	if r1 != _r1_pressed:
-		if r1: _player.request_spell(0)
-		else: _player.release_spell(0)
 	if r2 != _r2_pressed:
-		if r2: _player.request_spell(2)
-		else: _player.release_spell(2)
+		if r2: _player.request_cast(Player.SLOT_ENERGY)
+		else:  _player.release_cast(Player.SLOT_ENERGY)
+	if r1 != _r1_pressed:
+		if r1: _player.request_cast(Player.SLOT_IMPULSE)
+		else:  _player.release_cast(Player.SLOT_IMPULSE)
+	if l2 != _l2_pressed:
+		if l2: _player.request_cast(Player.SLOT_STRUCTURE)
+		else:  _player.release_cast(Player.SLOT_STRUCTURE)
+	if l1 != _l1_pressed:
+		if l1: _player.request_cast(Player.SLOT_CONDUCTION)
+		else:  _player.release_cast(Player.SLOT_CONDUCTION)
 
-	_l1_pressed = l1
-	_r1_pressed = r1
 	_r2_pressed = r2
+	_r1_pressed = r1
+	_l2_pressed = l2
+	_l1_pressed = l1

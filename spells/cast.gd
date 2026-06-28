@@ -1,13 +1,16 @@
-class_name Spell
+class_name Cast
 extends Node
 
+enum Axis { ENERGY, IMPULSE, STRUCTURE, CONDUCTION }
 
-
+var axis: Axis = Axis.ENERGY
+var energy_channel: EnergyChannelModule = null
+var form: FormModule = null
+var modifiers: Array[ModifierModule] = []
 
 @export var speed: float = 5.0
 @export var max_dist: float = 10.0
 
-# marker (set from the player)
 var marker: Node3D = null
 
 var is_active: bool:
@@ -18,7 +21,6 @@ var _dist: float = 0.0
 var _cast_dir: Vector3 = Vector3.FORWARD
 var _manual_dist: bool = false
 
-# where the spells resolves
 var _resolve_cell: Vector3i
 
 
@@ -56,12 +58,11 @@ func process(delta: float, origin: Vector3, _dir: Vector3) -> void:
 	marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
-##
 func _on_cast(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
 	_resolve_cell = cell_index
-	world_simulation.add_spell_to_be_resolved(self)
+	world_simulation.add_cast_to_resolve(self)
 
 
-## To be overwritten
-func resolve(world_simulation: WorldSimulation) -> void:
+## Override in subclasses to define the cast effect.
+func resolve(_world_simulation: WorldSimulation) -> void:
 	pass

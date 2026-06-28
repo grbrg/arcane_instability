@@ -45,11 +45,11 @@ func poll_joypad(_device_id: int, _camera: Camera3D) -> void:
 	pass
 
 
-func physics_process(delta: float, has_active_spell: bool) -> void:
+func physics_process(delta: float, has_active_cast: bool) -> void:
 	_handle_jump()
 	_apply_movement(delta)
 	_player.move_and_slide()
-	_update_rotation(delta, has_active_spell)
+	_update_rotation(delta, has_active_cast)
 
 
 func _handle_jump() -> void:
@@ -64,11 +64,11 @@ func _apply_movement(delta: float) -> void:
 	_player.velocity.z = move_toward(_player.velocity.z, target.z, acceleration * delta)
 
 
-func _update_rotation(delta: float, has_active_spell: bool) -> void:
+func _update_rotation(delta: float, has_active_cast: bool) -> void:
 	var target_dir := Vector3.ZERO
 	if _aim_dir != Vector3.ZERO:
 		target_dir = _aim_dir
-	elif not has_active_spell and _move_dir != Vector3.ZERO:
+	elif not has_active_cast and _move_dir != Vector3.ZERO:
 		target_dir = _move_dir
 	if target_dir != Vector3.ZERO:
 		_last_move_dir = _last_move_dir.lerp(target_dir.normalized(), turn_speed * delta).normalized()

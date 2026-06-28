@@ -8,9 +8,10 @@ var _cursor_pos: Vector3 = Vector3.ZERO
 var _following_player: bool = true
 var _raw_stick: Vector2 = Vector2.ZERO
 var _camera: Camera3D = null
-var _has_active_spell: bool = false
+var _has_active_cast: bool = false
 
 var _l1_pressed := false
+var _l2_pressed := false
 var _r1_pressed := false
 var _r2_pressed := false
 
@@ -27,16 +28,16 @@ func poll_joypad(device_id: int, camera: Camera3D) -> void:
 		Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_Y)
 	)
 	_camera = camera
-	_update_spell_inputs(device_id)
+	_update_cast_inputs(device_id)
 
 
-func physics_process(delta: float, has_active_spell: bool) -> void:
-	_has_active_spell = has_active_spell
+func physics_process(delta: float, has_active_cast: bool) -> void:
+	_has_active_cast = has_active_cast
 	_update_cursor(delta)
-	super.physics_process(delta, has_active_spell)
+	super.physics_process(delta, has_active_cast)
 	# Re-pin marker after move_and_slide() has moved the player (and drifted the child node)
 	_cursor_pos.y = _player.global_position.y
-	_player.set_spell_marker_position(_cursor_pos)
+	_player.set_cast_marker_position(_cursor_pos)
 
 
 func _update_cursor(delta: float) -> void:
@@ -65,25 +66,30 @@ func _update_cursor(delta: float) -> void:
 			to_cursor = Vector3.ZERO
 
 	var displaced := to_cursor.length() > 0.5
-	_player.set_spell_marker_visible(displaced or _has_active_spell)
+	_player.set_cast_marker_visible(displaced or _has_active_cast)
 	set_aim_input(to_cursor.normalized() if displaced else Vector3.ZERO)
 
 
-func _update_spell_inputs(device_id: int) -> void:
-	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
-	var r1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_RIGHT_SHOULDER)
+func _update_cast_inputs(device_id: int) -> void:
 	var r2 := Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) > TRIGGER_DEADZONE
+	var r1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_RIGHT_SHOULDER)
+	var l2 := Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_LEFT) > TRIGGER_DEADZONE
+	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
 
-	if l1 != _l1_pressed:
-		if l1: _player.request_spell(1)
-		else: _player.release_spell(1)
-	if r1 != _r1_pressed:
-		if r1: _player.request_spell(0)
-		else: _player.release_spell(0)
 	if r2 != _r2_pressed:
-		if r2: _player.request_spell(2)
-		else: _player.release_spell(2)
+		if r2: _player.request_cast(Player.SLOT_ENERGY)
+		else:  _player.release_cast(Player.SLOT_ENERGY)
+	if r1 != _r1_pressed:
+		if r1: _player.request_cast(Player.SLOT_IMPULSE)
+		else:  _player.release_cast(Player.SLOT_IMPULSE)
+	if l2 != _l2_pressed:
+		if l2: _player.request_cast(Player.SLOT_STRUCTURE)
+		else:  _player.release_cast(Player.SLOT_STRUCTURE)
+	if l1 != _l1_pressed:
+		if l1: _player.request_cast(Player.SLOT_CONDUCTION)
+		else:  _player.release_cast(Player.SLOT_CONDUCTION)
 
-	_l1_pressed = l1
-	_r1_pressed = r1
 	_r2_pressed = r2
+	_r1_pressed = r1
+	_l2_pressed = l2
+	_l1_pressed = l1
