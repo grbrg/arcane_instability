@@ -24,6 +24,8 @@ var sub_entities: Array[Entity]
 
 var conditions: Array[Condition]
 
+var characters: Array[Character] = []
+
 
 ##
 func _init(idx: Vector3i, _grid: GridMap, _subst: String) -> void:
@@ -64,6 +66,15 @@ func add_effect(type: String, adj: StatAdjustment) -> void:
 			temperature_view.position = grid.map_to_local(index)
 			temperature_view.update(ambient)
 			_property_views[type] = temperature_view
+
+
+func add_character(character: Character) -> void:
+	if not character in characters:
+		characters.append(character)
+
+
+func remove_character(character: Character) -> void:
+	characters.erase(character)
 
 
 func add_condition(cond: Condition) -> void:
@@ -145,3 +156,6 @@ func tick(delta: float) -> void:
 			if cv:
 				add_child(cv)
 				cv.position = grid.map_to_local(index)
+
+	for character in characters:
+		character.apply_stress_from_cell(self)

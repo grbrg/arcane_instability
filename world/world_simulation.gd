@@ -10,12 +10,14 @@ const TICK_TIME = 1.0
 
 var _spell_to_be_resolved: Array[Spell]
 
-
 var _cells = {}
 
 var _ambient: Ambient
 
 var _time_since_tick: float
+
+var _characters: Array[Character] = []
+var _character_cells: Dictionary = {}  # Character -> Vector3i
 
 
 func _ready() -> void:
@@ -62,13 +64,44 @@ func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
 		var neighbour_cell = _cells[neighbour]
 		cell.neighbours.append(neighbour_cell)
 
+func register_character(character: Character) -> void:
+	if not character in _characters:
+		_characters.append(character)
+
+
+func unregister_character(character: Character) -> void:
+	_characters.erase(character)
+	var old_index: Vector3i = _character_cells.get(character, Vector3i.MIN)
+	if old_index != Vector3i.MIN and old_index in _cells:
+		_cells[old_index].remove_character(character)
+	_character_cells.erase(character)
+
+
+func _world_to_grid(world_pos: Vector3) -> Vector3i:
+	return grid.local_to_map(grid.to_local(world_pos))
+
+
 ##
 func _process(delta: float) -> void:
+	_update_character_cells()
 	_time_since_tick += delta
 
 	if _time_since_tick > TICK_TIME:
 		_tick(_time_since_tick)
 		_time_since_tick = 0.0
+
+
+func _update_character_cells() -> void:
+	for character in _characters:
+		var new_index := _world_to_grid(character.global_position)
+		var old_index: Vector3i = _character_cells.get(character, Vector3i.MIN)
+		if new_index == old_index:
+			continue
+		if old_index != Vector3i.MIN and old_index in _cells:
+			_cells[old_index].remove_character(character)
+		if new_index in _cells:
+			_cells[new_index].add_character(character)
+		_character_cells[character] = new_index
 
 
 func add_spell_to_be_resolved(spell: Spell):
@@ -103,24 +136,20 @@ func get_grid_index(pos: Vector2) -> Vector3i:
 ##
 func _tick(delta: float) -> void:
 	# Step 1: resolve spells first
+	# Step 2: Update each cell's entities, e. g. temperature slowly goes to down/up
+	# 	Step 3: Transfer to neighbours
+	# 	Step 4: Check substance reactions
+	# 	Step 5: Create new states
+	# 	Step 6: Calculate damage
+	# 	Step 7: Reduce HP
+	# 	Step 8: Decay
+
 	for spell in _spell_to_be_resolved:
 		spell.resolve(self)
 
-	# Step 2: Update each cell's entities
-	# e. g. temperature slowly goes to down/up
 	for index in _cells:
 		var cell = _cells[index]
 		cell.tick(delta)
 	
-	# Step 3: Transfer to neighbours
 
-	# Step 4: Check substance reactions
-
-	# Step 5: Create new states
-
-	# Step 6: Calculate damage
-
-	# Step 7: Reduce HP
-
-	# Step 8: Decay
 	
