@@ -12,5 +12,5 @@ func resolve(world_simulation: WorldSimulation) -> void:
 	var adj := StatAdjustment.new()
 	adj.source = "player"
 	adj.adjustment_type = "value"
-	adj.adjustment_value = 1.0
+	adj.direction = Vector2(_cast_dir.x, _cast_dir.z).normalized()
 	world_simulation.add_effect(_resolve_cell, "impulse", adj)

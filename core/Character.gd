@@ -57,8 +57,8 @@ func apply_stress_from_cell(cell: GridCell) -> void:
 
 	var impulse := 0.0
 	var impulse_prop = cell.entity.get_property("impulse")
-	if impulse_prop:
-		impulse = impulse_prop.get_value()
+	if impulse_prop is ImpulseProperty:
+		impulse = impulse_prop.get_vector().length()
 
 	take_stress(energy_sum, impulse)
 

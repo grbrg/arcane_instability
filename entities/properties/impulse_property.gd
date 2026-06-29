@@ -1,25 +1,30 @@
 class_name ImpulseProperty
 extends EntityProperty
 # Impulse axis: pressure, movement, shockwaves.
-# Uses the same value/decay/conductivity simulation as energy channels
-# but is a separate state axis that drives different reactions.
+# Stored as a Vector2 whose magnitude encodes strength.
+# Multiple impulses from different sources accumulate additively.
+
+
+func get_vector() -> Vector2:
+	var v := Vector2.ZERO
+	for adj in get_adjustments_of_type("value"):
+		v += adj.direction
+	return v
+
+
+func add_adjustment(adjustment: StatAdjustment) -> void:
+	if not adjustment:
+		return
+	if not has_adjustment(adjustment.source):
+		_adjustments.append(adjustment)
+	else:
+		get_adjustment_from(adjustment.source).direction += adjustment.direction
 
 
 func tick(delta: float, _ambient: Ambient) -> void:
 	var adjs = get_adjustments_of_type("value")
 	for adj in adjs:
-		var new_val = lerp(adj.adjustment_value, 0.0, 1.0 - pow(1.0 - get_decay(), delta))
-
+		adj.direction = adj.direction.lerp(Vector2.ZERO, 1.0 - pow(1.0 - get_decay(), delta))
 		property_value_changed.emit(self)
-
-		adj.adjustment_value = new_val
-
-		if abs(adj.adjustment_value) < 0.01:
-			adj.adjustment_value = 0.0
-
-		adj.adjustment_factor = lerp(adj.adjustment_factor, 1.0, 1.0 - pow(1.0 - get_conductivity(), delta))
-		if abs(1.0 - adj.adjustment_factor) < 0.01:
-			adj.adjustment_factor = 1.0
-
-		if adj.adjustment_factor == 1.0 and adj.adjustment_value == 0.0:
+		if adj.direction.length() < 0.01:
 			remove_adjustment(adj)
