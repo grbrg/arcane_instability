@@ -5,6 +5,12 @@ extends EnemyState
 var _timer: float = 0.0
 
 
+
+func _init(e: Enemy) -> void:
+	super._init(e)
+	name = "attacking"
+
+
 func on_enter_state() -> void:
 	_timer = 0.0
 	enemy.velocity.x = 0.0
