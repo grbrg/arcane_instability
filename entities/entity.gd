@@ -5,9 +5,6 @@ extends Node
 ##
 
 
-signal property_diffusion(type: String)
-
-
 ## the states currenty acitve
 var _conditions: Array[Condition]
 
@@ -22,8 +19,6 @@ func _init(subst: Substance) -> void:
 	substance = subst
 
 	properties = substance.create_properties()
-	for key in properties:
-		properties[key].property_value_changed.connect(on_property_value_changed)
 
 
 ##
@@ -37,14 +32,6 @@ func get_property(type: String) -> EntityProperty:
 ## Return the current conditions of the entity
 func get_active_conditions() -> Array[Condition]:
 	return _conditions
-
-
-##
-func on_property_value_changed(source: EntityProperty) -> void:
-	for key in properties:
-		if properties[key] == source:
-			property_diffusion.emit(key)
-			return
 
 
 ##

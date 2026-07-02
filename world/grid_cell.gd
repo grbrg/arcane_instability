@@ -35,19 +35,18 @@ func _init(idx: Vector3i, _grid: GridMap, _subst: String) -> void:
 
 	substance = SubstanceRegistry.get_substance(_subst_type)
 
-	if _subst == "grass":
+	"""if _subst == "grass":
 		_ground = ResourceManager.grass_scene.instantiate()
 	else:
 		_ground = ResourceManager.ground_scene.instantiate()
 	_ground.set_substance(_subst_type)
 	add_child(_ground)
 	_ground.position = grid.local_to_map(index)
-	_ground.position.y = 0.0
+	_ground.position.y = 0.0"""
 	#Log.d("%s -> %d" % [str(index), _ground.position.y])
 	
 
 	entity = Entity.new(substance)
-	entity.property_diffusion.connect(on_property_diffusion)
 
 	add_condition(BurningCondition.new())
 
@@ -55,7 +54,7 @@ func _init(idx: Vector3i, _grid: GridMap, _subst: String) -> void:
 ##
 func add_effect(type: String, adj: StatAdjustment) -> void:
 	# check if we can add thermal properties
-	var prop = entity.get_property(type) #as ThermalEnergy
+	var prop = entity.get_property(type)
 	if prop:
 		prop.add_adjustment(adj)
 
@@ -120,20 +119,27 @@ func has_active_condition(type: String) -> bool:
 	return false
 
 
-##
-func on_property_diffusion(type: String):
-	#Log.d("Diffusion of %s" % str(index))
-	for n in neighbours:
-		var n_val = n.entity.get_property(type).get_value()
-		var val = entity.get_property(type).get_value()
-		var amount = (val - n_val) * entity.get_property(type).get_conductivity()
-		#Log.d("Amount: %f" % amount)
+func invalidate_property_caches() -> void:
+	for type in entity.properties:
+		entity.get_property(type).invalidate_cache()
 
-		var adj = StatAdjustment.new()
-		adj.source = str(index)
-		adj.adjustment_type = "value"
-		adj.adjustment_value = amount
-		n.add_effect(type, adj)
+
+func diffuse() -> void:
+	for type in entity.properties:
+		var prop := entity.get_property(type)
+		if not prop is EnergyProperty:
+			continue
+		var val: float = prop.get_value()
+		var cond: float = prop.get_conductivity()
+		for n in neighbours:
+			var n_val: float = n.entity.get_property(type).get_value()
+			var amount: float = (val - n_val) * cond
+			var adj := StatAdjustment.new()
+			adj.source = str(index)
+			adj.adjustment_type = "value"
+			adj.adjustment_value = amount
+			if amount != 0:
+				n.add_effect(type, adj)
 
 
 ##

@@ -151,6 +151,12 @@ func _tick(delta: float) -> void:
 	for index in _cells:
 		var cell = _cells[index]
 		cell.tick(delta)
+
+	for index in _cells:
+		_cells[index].invalidate_property_caches()
+
+	for index in _cells:
+		_cells[index].diffuse()
 	
 
 	

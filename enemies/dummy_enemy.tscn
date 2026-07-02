@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ca8w0albt6mj1"]
+
+[ext_resource type="Script" uid="uid://d16picb6ad2m2" path="res://enemies/dummy_enemy.gd" id="Script_1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cldl4"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ra0cx"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 4.0
+
+[node name="DummyEnemy" type="CharacterBody3D" unique_id=33826638]
+collision_layer = 4
+script = ExtResource("Script_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=391895534]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.24960428, 0)
+shape = SubResource("BoxShape3D_cldl4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1648061852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2544272, 0)
+mesh = SubResource("BoxMesh_ra0cx")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2055962897]
+
+[node name="DetectionArea" type="Area3D" parent="." unique_id=1142846759]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionArea" unique_id=1045254945]
+shape = SubResource("SphereShape3D_1")

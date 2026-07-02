@@ -84,10 +84,10 @@ func _debug_input(event: InputEvent) -> void:
 					adj.source = "debug" + str(Time.get_ticks_msec())
 					adj.adjustment_type = "value" # we adjust the value directly
 					adj.adjustment_value = 1.0
-					world_simulation.add_effect(grid_index, adj)
+					world_simulation.add_effect(grid_index, "thermal", adj)
 				if event.button_index == MOUSE_BUTTON_RIGHT:
 					var adj = StatAdjustment.new()
 					adj.source = "debug" + str(Time.get_ticks_msec())
 					adj.adjustment_type = "value" # we adjust the value directly
 					adj.adjustment_value = -1.0
-					world_simulation.add_effect(grid_index, adj)
+					world_simulation.add_effect(grid_index, "thermal", adj)
