@@ -144,6 +144,10 @@ func diffuse() -> void:
 
 ##
 func tick(delta: float) -> void:
+	# let active conditions apply their effects (e.g. burning adds heat)
+	for cond in conditions:
+		cond.tick(delta, entity, ambient)
+
 	# update the enitity properties
 	entity.tick(delta, ambient)
 

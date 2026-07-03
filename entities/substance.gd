@@ -5,7 +5,7 @@ extends Node
 @export_category("Thermal Energy")
 @export var thermal_capacity: float = 0.9
 @export var thermal_conductivity: float = 0.9
-@export var thermal_decay: float = 0.1
+@export var thermal_decay: float = 0.05
 @export var burning_temperature: float = 999999.9
 
 @export_category("Electrical Energy")

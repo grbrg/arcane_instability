@@ -7,9 +7,11 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 @export var max_integrity: float = 100.0
 @export var health_bar_offset: Vector3 = Vector3(0.0, 1.2, 0.0)
 ## Total energy (across all channels) a character can withstand before taking damage.
-@export var energy_tolerance: float = 50.0
+@export var energy_tolerance: float = 0.5
 ## Impulse a character can withstand before taking damage.
-@export var impulse_tolerance: float = 40.0
+@export var impulse_tolerance: float = 0.5
+## Multiplier applied to excess energy/impulse before dealing damage.
+@export var damage_scale: float = 20.0
 
 var health: HealthComp
 
@@ -50,7 +52,7 @@ func _ready() -> void:
 ## Called by the simulation each tick with current entity state totals.
 ## Damage = excess above tolerance, matching the system simulation loop (Step 6+7).
 func take_stress(total_energy: float, impulse: float) -> void:
-	var damage := maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, impulse - impulse_tolerance)
+	var damage := (maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, impulse - impulse_tolerance)) * damage_scale
 	health.take_damage(damage)
 
 

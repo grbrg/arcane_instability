@@ -28,20 +28,21 @@ func _init() -> void:
 	var gras = Substance.new()
 	gras.thermal_capacity = 0.25
 	gras.thermal_conductivity = 0.2
+	gras.thermal_decay = 0.05
 	gras.burning_temperature = 0.2
 	_substances["grass"] = gras
 
 	# Requires two thermal_bloom hits within ~1-2 seconds to ignite.
 	# entity.tick() decays heat before check_activation runs, so decay and
-	# capacity must be tuned against post-decay values:
-	#   one cast post-decay:       0.5 * 0.9 = 0.45  <  0.65  → no fire
-	#   two casts within ~1s:      1.0 * 0.9 = 0.90  >  0.65  → fire
-	#   two casts ~1-2s apart:    0.75 * 0.9 = 0.675 >  0.65  → fire
-	#   two casts 2s+ apart:     0.625 * 0.9 = 0.56  <  0.65  → no fire
+	# capacity must be tuned against post-decay values (decay=0.05):
+	#   one cast post-decay:       0.475 * 0.9 = 0.4275  <  0.65  → no fire
+	#   two casts within ~1s:      0.95  * 0.9 = 0.855   >  0.65  → fire
+	#   two casts ~1-2s apart:     0.9   * 0.9 = 0.81    >  0.65  → fire
+	#   two casts 2s+ apart:       0.85  * 0.9 = 0.765   >  0.65  → fire (long window)
 	var kindling = Substance.new()
 	kindling.thermal_capacity = 0.9
 	kindling.thermal_conductivity = 0.05
-	kindling.thermal_decay = 0.5
+	kindling.thermal_decay = 0.05
 	kindling.burning_temperature = 0.65
 	_substances["kindling"] = kindling
 

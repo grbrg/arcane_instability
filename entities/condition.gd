@@ -38,6 +38,11 @@ func check_deactiviation(_entity: Entity, _ambient: Ambient) -> bool:
 
 
 ##
+func tick(_delta: float, _entity: Entity, _ambient: Ambient) -> void:
+	pass
+
+
+##
 func deactivate(_cell: GridCell) -> void:
 	_is_active = false
 	_scene.ramp_down()
