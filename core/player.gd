@@ -20,6 +20,8 @@ var _controller: PlayerController
 
 
 func _ready() -> void:
+	super._ready()
+	
 	_casts.resize(4)
 	_assign_cast(SLOT_ENERGY, EnergyCast.new())
 	_assign_cast(SLOT_IMPULSE, ImpulseCast.new())

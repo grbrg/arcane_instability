@@ -23,6 +23,7 @@ var attack_cooldown_timer: float = 0.0
 var idle_state: EnemyIdleState
 var following_state: EnemyFollowingState
 var attacking_state: EnemyAttackingState
+var recovering_state: EnemyRecoveringState
 var wandering_state: EnemyWanderingState
 
 var _state_machine: StateMachine
@@ -50,12 +51,14 @@ func _setup_state_machine() -> void:
 	idle_state = EnemyIdleState.new(self)
 	following_state = EnemyFollowingState.new(self)
 	attacking_state = EnemyAttackingState.new(self)
+	recovering_state = EnemyRecoveringState.new(self)
 	wandering_state = EnemyWanderingState.new(self)
 
 	_state_machine.add_child(idle_state)
 	_state_machine.add_child(wandering_state)
 	_state_machine.add_child(following_state)
 	_state_machine.add_child(attacking_state)
+	_state_machine.add_child(recovering_state)
 	_state_machine.init()
 
 

@@ -24,7 +24,4 @@ func on_process(delta: float) -> void:
 		enemy.end_attack()
 		enemy.can_attack = false
 		enemy.attack_cooldown_timer = enemy.attack_cooldown_duration
-		if enemy.target_player != null:
-			enemy.change_state(enemy.following_state)
-		else:
-			enemy.change_state(enemy.idle_state)
+		enemy.change_state(enemy.recovering_state)

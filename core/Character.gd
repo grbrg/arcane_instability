@@ -1,9 +1,11 @@
 class_name Character
 extends CharacterBody3D
 
+const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 
 @export_category("Integrity")
 @export var max_integrity: float = 100.0
+@export var health_bar_offset: Vector3 = Vector3(0.0, 1.2, 0.0)
 ## Total energy (across all channels) a character can withstand before taking damage.
 @export var energy_tolerance: float = 50.0
 ## Impulse a character can withstand before taking damage.
@@ -38,6 +40,11 @@ func _ready() -> void:
 	health.max_integrity = max_integrity
 	health.name = "HealthComponent"
 	add_child(health)
+
+	var bar: HealthBar = HEALTH_BAR_SCENE.instantiate()
+	bar.character = self
+	bar.position = health_bar_offset
+	add_child(bar)
 
 
 ## Called by the simulation each tick with current entity state totals.
