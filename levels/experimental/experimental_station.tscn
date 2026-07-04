@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://swtfucmv1dl8" path="res://core/player.tscn" id="5_xpqyo"]
 [ext_resource type="PackedScene" uid="uid://ca8w0albt6mj1" path="res://enemies/dummy_enemy.tscn" id="7_clr4a"]
 [ext_resource type="Script" uid="uid://cx5adsj5gp61u" path="res://enemies/spawner/enemy_spawner.gd" id="8_w75ax"]
+[ext_resource type="Script" uid="uid://tw70sdxu148g" path="res://core/player_spawner.gd" id="9_6lhb3"]
 
 [sub_resource type="Sky" id="Sky_k2v8w"]
 
@@ -20,10 +21,10 @@ ambient_light_color = Color(0.6771736, 0.6771736, 0.6771737, 1)
 vertices = PackedVector3Array(-20.5, 0.575, -5.5, -8.5, 0.575, -5.5, -8.5, 0.575, -6, -7.5, 0.575, -6.5, -7.5, 0.575, -18.5, -20.5, 0.575, -18.5, -7, 0.575, -4.5, -5.5, 0.575, -3.75, -5, 0.575, -4.5, -6.5, 0.575, -6, -2.5, 0.575, -7, -1.5, 0.575, -7.5, -1.5, 0.575, -18.5, -3.75, 0.575, -4.25, -2.25, 0.575, -5.75, -1, 0.575, -7.5, -0.5, 0.575, -6.5, 8.5, 0.575, -6.5, 8.5, 0.575, -18.5, -3.5, 0.575, -3.25, -1, 0.575, -5.5, -2.25, 0.825, 2.5, -1.5, 0.825, 3.5, 8.5, 0.575, 3.5, -5.5, 0.575, -3.25, -8, 0.575, -4.5, -8, 0.825, 2.5, -7.25, 0.825, 2.5, -8.5, 0.825, 3.5, -20.5, 0.825, 3.5, -3.5, 0.825, 6, -2.75, 0.825, 4.5, -3.5, 0.825, 4, -5, 0.825, 5.5, -4, 0.575, -2.5, -6.5, 0.825, 4, -7.25, 0.825, 4.5, -5.5, 0.825, 6.25, -6.5, 0.825, 3, -3.5, 0.825, 3, -5, 0.575, -2.5, -5.5, 0.825, 7, -8, 0.825, 4.5, -4.5, 0.825, 19.5, -20.5, 0.825, 19.5, -4.5, 0.825, 7.5, -2, 0.825, 4.5, -3.5, 0.825, 7, 8.5, 0.575, 19.5)
 polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(3, 2, 4), PackedInt32Array(4, 2, 5), PackedInt32Array(5, 2, 0), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(9, 3, 10), PackedInt32Array(10, 3, 11), PackedInt32Array(11, 3, 12), PackedInt32Array(12, 3, 4), PackedInt32Array(13, 8, 14), PackedInt32Array(14, 8, 10), PackedInt32Array(10, 8, 9), PackedInt32Array(16, 15, 17), PackedInt32Array(17, 15, 18), PackedInt32Array(18, 15, 12), PackedInt32Array(15, 11, 12), PackedInt32Array(19, 13, 14), PackedInt32Array(14, 20, 19), PackedInt32Array(19, 20, 21), PackedInt32Array(21, 20, 22), PackedInt32Array(16, 17, 20), PackedInt32Array(20, 17, 23), PackedInt32Array(20, 23, 22), PackedInt32Array(7, 24, 6), PackedInt32Array(6, 24, 25), PackedInt32Array(25, 24, 27), PackedInt32Array(25, 27, 26), PackedInt32Array(26, 28, 25), PackedInt32Array(25, 28, 1), PackedInt32Array(1, 28, 29), PackedInt32Array(1, 29, 0), PackedInt32Array(31, 30, 32), PackedInt32Array(32, 30, 33), PackedInt32Array(34, 19, 21), PackedInt32Array(33, 37, 35), PackedInt32Array(35, 37, 36), PackedInt32Array(38, 27, 39), PackedInt32Array(39, 27, 21), PackedInt32Array(21, 27, 40), PackedInt32Array(21, 40, 34), PackedInt32Array(32, 33, 39), PackedInt32Array(39, 33, 35), PackedInt32Array(39, 35, 38), PackedInt32Array(27, 24, 40), PackedInt32Array(37, 41, 36), PackedInt32Array(36, 41, 42), PackedInt32Array(41, 43, 42), PackedInt32Array(42, 43, 29), PackedInt32Array(29, 43, 44), PackedInt32Array(41, 45, 43), PackedInt32Array(29, 28, 42), PackedInt32Array(30, 31, 46), PackedInt32Array(30, 46, 47), PackedInt32Array(47, 46, 23), PackedInt32Array(46, 22, 23), PackedInt32Array(45, 47, 43), PackedInt32Array(43, 47, 48), PackedInt32Array(48, 47, 23)]
 
-[node name="ExperimentalStation" type="Node3D" unique_id=2072741116 node_paths=PackedStringArray("players", "enemies", "grid", "world_simulation", "camera")]
+[node name="ExperimentalStation" type="Node3D" unique_id=2072741116 node_paths=PackedStringArray("player_spawner", "enemy_spawner", "grid", "world_simulation", "camera")]
 script = ExtResource("1_bp11k")
-players = [NodePath("Player1"), NodePath("Player2")]
-enemies = [NodePath("")]
+player_spawner = NodePath("PlayerSpawner")
+enemy_spawner = NodePath("EnemySpawner")
 grid = NodePath("NavigationRegion3D/GridMap")
 world_simulation = NodePath("WorldSimulation")
 camera = NodePath("IsometricCamera3D")
@@ -54,15 +55,6 @@ script = ExtResource("4_vekve")
 world_simulation = NodePath("../WorldSimulation")
 level = NodePath("..")
 camera = NodePath("../IsometricCamera3D")
-
-[node name="Player1" parent="." unique_id=1099819557 node_paths=PackedStringArray("level") instance=ExtResource("5_xpqyo")]
-device_id = 0
-level = NodePath("..")
-
-[node name="Player2" parent="." unique_id=959764023 node_paths=PackedStringArray("level") instance=ExtResource("5_xpqyo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1430664, 0, 0)
-device_id = 1
-level = NodePath("..")
 
 [node name="Walls" type="Node3D" parent="." unique_id=1779188957]
 
@@ -107,3 +99,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.080322, 1.0748291, 0)
 script = ExtResource("8_w75ax")
 enemy_scene = ExtResource("7_clr4a")
 metadata/_custom_type_script = "uid://cx5adsj5gp61u"
+
+[node name="PlayerSpawner" type="Node3D" parent="." unique_id=447320229]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6425781, 0)
+script = ExtResource("9_6lhb3")
+player_scene = ExtResource("5_xpqyo")
+number_of_players = 2

@@ -2,9 +2,9 @@ class_name Level
 extends Node3D
 
 
-@export var players: Array[Player]
+@export var player_spawner: PlayerSpawner
 
-@export var enemies: Array[Enemy]
+@export var enemy_spawner: EnemySpawner
 
 @export var grid: GridMap
 
@@ -13,10 +13,27 @@ extends Node3D
 @export var camera: IsometricCamera3D
 
 
+var players: Array[Player]
+
+var enemies: Array[Enemy]
+
+
 
 func _ready() -> void:
-	camera.follow_targets = players
-	for player in players:
+	player_spawner.player_spawned.connect(_on_player_spawned)
+	enemy_spawner.enemy_spawned.connect(_on_enemy_spawned)
+
+	player_spawner.spawn_all_players()
+
+
+func _on_player_spawned(player: Player) -> void:
+	if not player in players:
+		player.append(player)
+		camera.follow_targets.append(player)
 		world_simulation.register_character(player)
-	for enemy in enemies:
+
+
+func _on_enemy_spawned(enemy: Enemy) -> void:
+	if not enemy in enemies:
+		enemies.append(enemy)
 		world_simulation.register_character(enemy)

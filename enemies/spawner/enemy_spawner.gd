@@ -2,6 +2,7 @@ class_name EnemySpawner
 extends Node3D
 
 
+signal enemy_spawned(enemey: Enemy)
 signal wave_started(wave_number: int)
 signal all_waves_completed()
 
@@ -48,6 +49,8 @@ func _spawn_enemy() -> void:
 	)
 	get_parent().add_child(enemy)
 	enemy.global_position = global_position
+
+	enemy_spawned.emit(enemy)
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
