@@ -65,8 +65,11 @@ func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
 		cell.neighbours.append(neighbour_cell)
 
 func register_character(character: Character) -> void:
+	if character == null or not is_instance_valid(character):
+		return
 	if not character in _characters:
 		_characters.append(character)
+		character.tree_exiting.connect(func(): unregister_character(character))
 
 
 func unregister_character(character: Character) -> void:
