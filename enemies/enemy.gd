@@ -2,9 +2,11 @@ class_name Enemy
 extends Character
 
 
+@export var level: Level
+
 @export_category("Detection")
 @export var detection_radius: float = 8.0
-@export var attack_range: float = 2.0
+@export var attack_range: float = 1.0
 
 @export_category("Combat")
 @export var attack_duration: float = 0.8

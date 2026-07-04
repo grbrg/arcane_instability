@@ -89,8 +89,9 @@ use_collision = true
 collision_mask = 7
 size = Vector3(40, 1, 1)
 
-[node name="DummyEnemy" parent="." unique_id=33826638 instance=ExtResource("7_clr4a")]
+[node name="DummyEnemy" parent="." unique_id=33826638 node_paths=PackedStringArray("level") instance=ExtResource("7_clr4a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.345337, 0.50061035, 0)
+level = NodePath("..")
 move_speed = 1.5
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=303323404]
