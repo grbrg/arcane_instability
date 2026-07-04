@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://ca8w0albt6mj1" path="res://enemies/dummy_enemy.tscn" id="7_clr4a"]
 [ext_resource type="Script" uid="uid://cx5adsj5gp61u" path="res://enemies/spawner/enemy_spawner.gd" id="8_w75ax"]
 [ext_resource type="Script" uid="uid://tw70sdxu148g" path="res://core/player_spawner.gd" id="9_6lhb3"]
+[ext_resource type="Script" uid="uid://dn8177qto4xap" path="res://ui/versus_hud.gd" id="10_xohi2"]
 
 [sub_resource type="Sky" id="Sky_k2v8w"]
 
@@ -105,3 +106,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6425781, 0)
 script = ExtResource("9_6lhb3")
 player_scene = ExtResource("5_xpqyo")
 number_of_players = 2
+
+[node name="VersusHUD" type="CanvasLayer" parent="." unique_id=329399772]
+script = ExtResource("10_xohi2")

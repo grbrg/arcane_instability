@@ -3,6 +3,7 @@ extends Node3D
 
 
 signal enemy_spawned(enemey: Enemy)
+signal enemy_died
 signal wave_started(wave_number: int)
 signal all_waves_completed()
 
@@ -54,6 +55,7 @@ func _spawn_enemy() -> void:
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
+	enemy_died.emit()
 	enemy.queue_free()
 	_living_enemies -= 1
 	if _living_enemies <= 0:

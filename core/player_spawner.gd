@@ -3,6 +3,7 @@ extends Node3D
 
 
 signal player_spawned(player: Player)
+signal player_died(device_id: int)
 
 
 @export var player_scene: PackedScene
@@ -52,6 +53,7 @@ func _spawn_player(device_id: int) -> void:
 
 
 func _on_player_died(player: Player, device_id: int) -> void:
+	player_died.emit(device_id)
 	if level:
 		level.players.erase(player)
 		if level.camera:
