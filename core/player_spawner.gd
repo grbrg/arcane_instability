@@ -10,7 +10,7 @@ signal player_died(device_id: int)
 @export var level: Level
 @export var world_simulation: WorldSimulation
 @export var number_of_players: int = 1
-@export var respawn_delay: float = 3.0
+@export var respawn_delay: float = 10.0
 @export var player_colors: Array[Color] = [Color.DARK_GREEN, Color.INDIAN_RED, Color.SKY_BLUE, Color.DEEP_PINK]
 
 

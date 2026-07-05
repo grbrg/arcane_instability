@@ -7,6 +7,7 @@ const TICK_TIME = 1.0
 
 @export var camera: Camera3D
 @export var grid: GridMap
+@export var biome: Biome
 
 var _casts_to_resolve: Array[Cast]
 
@@ -36,16 +37,7 @@ func _reset_grid():
 		# first add all cells
 		for cell_index in cell_indices:
 			var item = grid.get_cell_item(cell_index)
-			var subst = ""
-			match item:
-				0: 
-					subst = "grass"
-				8:
-					subst = "kindling"
-				22:
-					subst = "water"
-				_:
-					subst = "grass"
+			var subst = biome.get_substance(item)
 
 			var new_cell = GridCell.new(cell_index, grid, subst)
 			new_cell.ambient = _ambient

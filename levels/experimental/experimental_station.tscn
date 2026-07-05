@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://8xp7ldtyf6dh" path="res://levels/experimental/experimental_station.gd" id="1_bp11k"]
 [ext_resource type="MeshLibrary" uid="uid://cd142mormf0b8" path="res://levels/experimental/tiles_ground.tres" id="1_vekve"]
 [ext_resource type="Script" uid="uid://dffgms1eq2n5a" path="res://core/isometric_camera_3d.gd" id="2_73fdw"]
+[ext_resource type="Script" uid="uid://be58lfx7ni5on" path="res://world/biomes/experimental_biome.gd" id="2_pbdnv"]
 [ext_resource type="Script" uid="uid://dx0mnikg5y36l" path="res://world/world_simulation.gd" id="3_vekve"]
 [ext_resource type="Script" uid="uid://c8s7xp4da3mgf" path="res://core/input_manager.gd" id="4_vekve"]
 [ext_resource type="PackedScene" uid="uid://swtfucmv1dl8" path="res://core/player.tscn" id="5_xpqyo"]
@@ -40,16 +41,21 @@ shadow_enabled = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Environment" unique_id=1307345381]
 environment = SubResource("Environment_cmtiu")
 
+[node name="ExperimentalBiome" type="Node" parent="." unique_id=340145761]
+script = ExtResource("2_pbdnv")
+metadata/_custom_type_script = "uid://be58lfx7ni5on"
+
 [node name="IsometricCamera3D" type="Camera3D" parent="." unique_id=2054747562]
 transform = Transform3D(0.7071068, -0.5, 0.5, 0, 0.7071068, 0.70710677, -0.7071068, -0.5, 0.5, 13.446659, 20, 13.732964)
 projection = 1
 size = 10.0
 script = ExtResource("2_73fdw")
 
-[node name="WorldSimulation" type="Node3D" parent="." unique_id=2047512483 node_paths=PackedStringArray("camera", "grid")]
+[node name="WorldSimulation" type="Node3D" parent="." unique_id=2047512483 node_paths=PackedStringArray("camera", "grid", "biome")]
 script = ExtResource("3_vekve")
 camera = NodePath("../IsometricCamera3D")
 grid = NodePath("../NavigationRegion3D/GridMap")
+biome = NodePath("../ExperimentalBiome")
 
 [node name="InputManager" type="Node" parent="." unique_id=602915657 node_paths=PackedStringArray("world_simulation", "level", "camera")]
 script = ExtResource("4_vekve")
