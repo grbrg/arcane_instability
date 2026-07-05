@@ -1,6 +1,10 @@
 class_name TwinstickPlayerController
 extends PlayerController
 
+func snaps_cast_to_distance() -> bool:
+	return true
+
+
 var _l1_pressed := false
 var _l2_pressed := false
 var _r1_pressed := false
@@ -18,16 +22,14 @@ func _update_aim(device_id: int, camera: Camera3D) -> void:
 		Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_Y)
 	)
 	var aim_dir := Vector3.ZERO
-	var magnitude := 0.0
 	if raw.length() > STICK_DEADZONE:
 		var basis := camera.global_transform.basis
 		var cam_forward := -Vector3(basis.z.x, 0.0, basis.z.z).normalized()
 		var cam_right := Vector3(basis.x.x, 0.0, basis.x.z).normalized()
 		aim_dir = (cam_right * raw.x - cam_forward * raw.y).normalized()
-		magnitude = clampf((raw.length() - STICK_DEADZONE) / (1.0 - STICK_DEADZONE), 0.0, 1.0)
 	set_aim_input(aim_dir)
 	if aim_dir != Vector3.ZERO:
-		_player.redirect_active_cast(aim_dir, magnitude)
+		_player.redirect_active_cast(aim_dir)
 
 
 func _update_cast_inputs(device_id: int) -> void:

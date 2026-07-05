@@ -1,0 +1,2 @@
+class_name CastModifier
+extends Resource

@@ -21,14 +21,19 @@ var _controller: PlayerController
 
 func _ready() -> void:
 	super._ready()
-	
+
 	_casts.resize(4)
 	_assign_cast(SLOT_ENERGY, EnergyCast.new())
 	_assign_cast(SLOT_IMPULSE, ImpulseCast.new())
 	_assign_cast(SLOT_STRUCTURE, StructureCast.new())
 	_assign_cast(SLOT_CONDUCTION, ConductionCast.new())
 
-	_controller = WorldCursorPlayerController.new(self)
+	_controller = TwinstickPlayerController.new(self)
+
+	if _controller.snaps_cast_to_distance():
+		for cast in _casts:
+			if cast != null:
+				cast.snap_to_distance = true
 
 
 func _assign_cast(slot: int, cast: Cast) -> void:
@@ -93,7 +98,13 @@ func release_cast(slot: int) -> void:
 	var cast := _casts[slot]
 	if cast != null and cast == _active_cast:
 		var grid := level.world_simulation.grid
-		var index = grid.local_to_map(grid.to_local(_cast_marker.global_position))
+		var target_pos: Vector3
+		if cast.show_marker:
+			target_pos = _cast_marker.global_position
+		else:
+			var dist = cast.max_dist
+			target_pos = global_position + cast._cast_dir * dist
+		var index = grid.local_to_map(grid.to_local(target_pos))
 		cast.deactivate_marker(level.world_simulation, index)
 		_active_cast = null
 

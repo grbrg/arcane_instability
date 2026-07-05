@@ -5,7 +5,8 @@ extends Cast
 func _init() -> void:
 	axis = Cast.Axis.STRUCTURE
 	speed = 4.0
-	max_dist = 6.0
+	distance_modifier = DistanceModifier.new()
+	distance_modifier.distance = DistanceModifier.Distance.SHORT
 
 
 func resolve(world_simulation: WorldSimulation) -> void:

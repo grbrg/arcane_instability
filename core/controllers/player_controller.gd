@@ -37,6 +37,14 @@ func get_facing_dir() -> Vector3:
 	return _last_move_dir
 
 
+func uses_cast_marker() -> bool:
+	return true
+
+
+func snaps_cast_to_distance() -> bool:
+	return false
+
+
 func handle_joypad_button(_event: InputEventJoypadButton) -> void:
 	pass
 
