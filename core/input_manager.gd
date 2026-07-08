@@ -67,9 +67,11 @@ func _handle_player_input(event: InputEvent, player: Player) -> void:
 			elif event.is_action_released("spell%d" % (i + 1)):
 				player.release_spell(i)
 	elif event is InputEventJoypadButton:
-		if event.is_pressed() and event.button_index == JOY_BUTTON_A:
-			player.request_jump()
-		player.handle_joypad_button(event)
+		if event.button_index == JOY_BUTTON_A:
+			if event.is_pressed():
+				player.request_jump()
+		else:
+			player.handle_joypad_button(event)
 
 
 func _debug_input(event: InputEvent) -> void:

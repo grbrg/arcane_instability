@@ -107,6 +107,11 @@ func add_cast_to_resolve(cast: Cast) -> void:
 		_casts_to_resolve.append(cast)
 
 
+func force_tick() -> void:
+	_tick(maxf(_time_since_tick, TICK_TIME))
+	_time_since_tick = 0.0
+
+
 func add_effect(index: Vector3i, type: String, adj: StatAdjustment) -> void:
 	if index in _cells:
 		var cell = _cells[index]

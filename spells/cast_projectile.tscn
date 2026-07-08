@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://ckp0tlvn8kamb"]
+
+[ext_resource type="Script" uid="uid://ck6mjuef82f2l" path="res://spells/cast_projectile.gd" id="Script_cast_projectile"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_lct76"]
+radius = 0.25
+height = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6grrg"]
+albedo_color = Color(1, 0.67058825, 0.23921569, 0.43529412)
+
+[node name="Cast" type="Node3D" unique_id=365476070]
+script = ExtResource("Script_cast_projectile")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1136031005]
+mesh = SubResource("SphereMesh_lct76")
+surface_material_override/0 = SubResource("StandardMaterial3D_6grrg")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=804617375]
+light_color = Color(1, 0.59607846, 0.1882353, 1)

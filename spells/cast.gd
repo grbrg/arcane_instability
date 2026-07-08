@@ -15,6 +15,7 @@ var distance_modifier: DistanceModifier = null
 var extension_modifier: ExtensionModifier = null
 
 @export var speed: float = 5.0
+@export var strength: float = 1.0
 
 var max_dist: float:
 	get:
@@ -38,8 +39,30 @@ var _active: bool = false
 var _dist: float = 0.0
 var _cast_dir: Vector3 = Vector3.FORWARD
 var _manual_dist: bool = false
+var _cooldown_remaining: float = 0.0
+
+var is_on_cooldown: bool:
+	get: return _cooldown_remaining > 0.0
+
+var cooldown_fraction: float:
+	get:
+		var total := cooldown
+		if total <= 0.0:
+			return 0.0
+		return minf(_cooldown_remaining / total, 1.0)
+
+var cooldown: float:
+	get:
+		var total := 0.5
+		for m in [energy_type_modifier, area_modifier, distance_modifier, extension_modifier]:
+			if m != null:
+				total += m.get_cooldown_adjustment()
+		return max(0, total)
 
 var _resolve_cell: Vector3i
+
+var resolve_cell: Vector3i:
+	get: return _resolve_cell
 
 
 func activate_marker(origin: Vector3, dir: Vector3) -> void:
@@ -53,13 +76,14 @@ func activate_marker(origin: Vector3, dir: Vector3) -> void:
 		marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
-func deactivate_marker(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
+func deactivate_marker(_world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
 	if not _active:
 		return
 	_active = false
 	if show_marker:
 		marker.visible = false
-	_on_cast(world_simulation, cell_index)
+	_resolve_cell = cell_index
+	_cooldown_remaining = cooldown
 
 
 func redirect(dir: Vector3, magnitude: float = -1.0) -> void:
@@ -72,7 +96,9 @@ func redirect(dir: Vector3, magnitude: float = -1.0) -> void:
 
 
 func process(delta: float, origin: Vector3, _dir: Vector3) -> void:
-	if not show_marker:
+	if _cooldown_remaining > 0.0:
+		_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
+	if not show_marker or not _active:
 		return
 	if snap_to_distance:
 		_dist = max_dist
@@ -82,11 +108,15 @@ func process(delta: float, origin: Vector3, _dir: Vector3) -> void:
 	marker.rotation.y = atan2(_cast_dir.x, _cast_dir.z)
 
 
-func _on_cast(world_simulation: WorldSimulation, cell_index: Vector3i) -> void:
-	_resolve_cell = cell_index
-	world_simulation.add_cast_to_resolve(self)
-
-
-## Override in subclasses to define the cast effect.
-func resolve(_world_simulation: WorldSimulation) -> void:
+## Override in subclasses to apply the cast effect to a specific cell at a given strength.
+func apply_to_cell(_world_simulation: WorldSimulation, _cell: Vector3i, _strength: float) -> void:
 	pass
+
+
+func resolve(world_simulation: WorldSimulation) -> void:
+	apply_to_cell(world_simulation, _resolve_cell, strength)
+	if area_modifier != null and area_modifier.target_area == AreaModifier.TargetArea.AREA:
+		var cell := world_simulation.get_cell(_resolve_cell)
+		if cell != null:
+			for neighbour in cell.neighbours:
+				apply_to_cell(world_simulation, neighbour.index, strength)

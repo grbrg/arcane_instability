@@ -2,6 +2,14 @@ class_name FaceButtonsPlayerController
 extends PlayerController
 
 
+func uses_cast_marker() -> bool:
+	return false
+
+
+func snaps_cast_to_distance() -> bool:
+	return true
+
+
 func handle_joypad_button(event: InputEventJoypadButton) -> void:
 	if event.is_pressed():
 		match event.button_index:

@@ -9,9 +9,9 @@ func _init() -> void:
 	distance_modifier.distance = DistanceModifier.Distance.SHORT
 
 
-func resolve(world_simulation: WorldSimulation) -> void:
+func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: float) -> void:
 	var adj := StatAdjustment.new()
 	adj.source = "player"
 	adj.adjustment_type = "value"
-	adj.adjustment_value = 1.0
-	world_simulation.add_effect(_resolve_cell, "structure", adj)
+	adj.adjustment_value = strength
+	world_simulation.add_effect(cell, "structure", adj)

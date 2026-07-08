@@ -1,6 +1,8 @@
 class_name Player
 extends Character
 
+const CAST_PROJECTILE_SCENE = preload("res://spells/cast_projectile.tscn")
+
 @export var device_id: int = -1
 @export var level: Level
 
@@ -12,6 +14,8 @@ const SLOT_STRUCTURE  = 2
 const SLOT_CONDUCTION = 3
 
 var _casts: Array[Cast] = []
+var casts: Array[Cast]:
+	get: return _casts
 var _active_cast: Cast = null
 var _controller: PlayerController
 
@@ -28,12 +32,14 @@ func _ready() -> void:
 	_assign_cast(SLOT_STRUCTURE, StructureCast.new())
 	_assign_cast(SLOT_CONDUCTION, ConductionCast.new())
 
-	_controller = TwinstickPlayerController.new(self)
+	_controller = FaceButtonsPlayerController.new(self)
 
-	if _controller.snaps_cast_to_distance():
-		for cast in _casts:
-			if cast != null:
-				cast.snap_to_distance = true
+	var snaps := _controller.snaps_cast_to_distance()
+	var shows_marker := _controller.uses_cast_marker()
+	for cast in _casts:
+		if cast != null:
+			cast.snap_to_distance = snaps
+			cast.show_marker = shows_marker
 
 
 func _assign_cast(slot: int, cast: Cast) -> void:
@@ -87,7 +93,7 @@ func request_cast(slot: int) -> void:
 	if _active_cast != null or slot >= _casts.size():
 		return
 	var cast := _casts[slot]
-	if cast != null:
+	if cast != null and not cast.is_on_cooldown:
 		cast.activate_marker(global_position, _controller.get_facing_dir())
 		_active_cast = cast
 
@@ -97,15 +103,21 @@ func release_cast(slot: int) -> void:
 		return
 	var cast := _casts[slot]
 	if cast != null and cast == _active_cast:
-		var grid := level.world_simulation.grid
+		var world_sim := level.world_simulation
+		var grid := world_sim.grid
 		var target_pos: Vector3
 		if cast.show_marker:
 			target_pos = _cast_marker.global_position
 		else:
-			var dist = cast.max_dist
-			target_pos = global_position + cast._cast_dir * dist
-		var index = grid.local_to_map(grid.to_local(target_pos))
-		cast.deactivate_marker(level.world_simulation, index)
+			target_pos = global_position + cast._cast_dir * cast.max_dist
+		var index := grid.local_to_map(grid.to_local(target_pos))
+		cast.deactivate_marker(world_sim, index)
+
+		var projectile := CAST_PROJECTILE_SCENE.instantiate()
+		level.add_child(projectile)
+		projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
+		projectile.setup(cast, target_pos, world_sim)
+
 		_active_cast = null
 
 
@@ -117,7 +129,9 @@ func _physics_process(delta: float) -> void:
 
 
 func _process_casts(delta: float) -> void:
-	if _active_cast != null:
-		_active_cast.process(delta, global_position, _controller.get_facing_dir())
-		if not _active_cast.is_active:
-			_active_cast = null
+	var facing := _controller.get_facing_dir()
+	for cast in _casts:
+		if cast != null:
+			cast.process(delta, global_position, facing)
+	if _active_cast != null and not _active_cast.is_active:
+		_active_cast = null

@@ -8,15 +8,17 @@ func _init() -> void:
 	energy_type_modifier = EnergyTypeModifier.new()
 	energy_type_modifier.type = EnergyTypeModifier.Type.THERMAL
 	distance_modifier = DistanceModifier.new()
-	distance_modifier.distance = DistanceModifier.Distance.SHORT
+	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
+	area_modifier = AreaModifier.new()
+	area_modifier.target_area = AreaModifier.TargetArea.AREA
 
 
-func resolve(world_simulation: WorldSimulation) -> void:
+func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: float) -> void:
 	var adj := StatAdjustment.new()
 	adj.source = "player"
 	adj.adjustment_type = "value"
-	adj.adjustment_value = 1.0
-	world_simulation.add_effect(_resolve_cell, _energy_type(), adj)
+	adj.adjustment_value = strength
+	world_simulation.add_effect(cell, _energy_type(), adj)
 
 
 func _energy_type() -> String:

@@ -9,9 +9,10 @@ func _init() -> void:
 	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
 
 
-func resolve(world_simulation: WorldSimulation) -> void:
+func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: float) -> void:
 	var adj := StatAdjustment.new()
 	adj.source = "player"
 	adj.adjustment_type = "value"
+	adj.adjustment_value = strength
 	adj.direction = Vector2(_cast_dir.x, _cast_dir.z).normalized()
-	world_simulation.add_effect(_resolve_cell, "impulse", adj)
+	world_simulation.add_effect(cell, "impulse", adj)
