@@ -11,10 +11,10 @@ const MAX_DIST: Dictionary = {
 }
 
 const COOLDOWN_ADJUSTMENT: Dictionary = {
-	Distance.AROUND_PLAYER: 2.0,
-	Distance.SHORT:         2.5,
+	Distance.AROUND_PLAYER: 1.0,
+	Distance.SHORT:         2.0,
 	Distance.MIDDLE:        3.0,
-	Distance.FAR:           3.5,
+	Distance.FAR:           4.0,
 }
 
 @export var distance: Distance = Distance.SHORT

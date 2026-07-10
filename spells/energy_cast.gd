@@ -8,9 +8,9 @@ func _init() -> void:
 	energy_type_modifier = EnergyTypeModifier.new()
 	energy_type_modifier.type = EnergyTypeModifier.Type.THERMAL
 	distance_modifier = DistanceModifier.new()
-	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
+	distance_modifier.distance = DistanceModifier.Distance.AROUND_PLAYER
 	area_modifier = AreaModifier.new()
-	area_modifier.target_area = AreaModifier.TargetArea.AREA
+	area_modifier.target_area = AreaModifier.TargetArea.POINT
 
 
 func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: float) -> void:

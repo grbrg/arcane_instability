@@ -105,20 +105,37 @@ func release_cast(slot: int) -> void:
 	if cast != null and cast == _active_cast:
 		var world_sim := level.world_simulation
 		var grid := world_sim.grid
-		var target_pos: Vector3
-		if cast.show_marker:
-			target_pos = _cast_marker.global_position
-		else:
-			target_pos = global_position + cast._cast_dir * cast.max_dist
-		var index := grid.local_to_map(grid.to_local(target_pos))
-		cast.deactivate_marker(world_sim, index)
+		var player_cell := grid.local_to_map(grid.to_local(global_position))
 
-		var projectile := CAST_PROJECTILE_SCENE.instantiate()
-		level.add_child(projectile)
-		projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
-		projectile.setup(cast, target_pos, world_sim)
+		if cast.distance_modifier != null \
+				and cast.distance_modifier.distance == DistanceModifier.Distance.AROUND_PLAYER \
+				and cast.area_modifier.target_area == AreaModifier.TargetArea.AREA:
+			cast.deactivate_marker(world_sim, player_cell)
+			_resolve_around_player(cast, player_cell, world_sim)
+		else:
+			var target_pos: Vector3
+			if cast.show_marker:
+				target_pos = _cast_marker.global_position
+			else:
+				target_pos = global_position + cast._cast_dir * cast.max_dist
+			var index := grid.local_to_map(grid.to_local(target_pos))
+			cast.deactivate_marker(world_sim, index)
+
+			var projectile := CAST_PROJECTILE_SCENE.instantiate()
+			level.add_child(projectile)
+			projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
+			projectile.setup(cast, target_pos, world_sim)
 
 		_active_cast = null
+
+
+func _resolve_around_player(cast: Cast, player_cell: Vector3i, world_sim: WorldSimulation) -> void:
+	var center := world_sim.get_cell(player_cell)
+	if center == null:
+		return
+	for neighbour in center.neighbours:
+		cast.apply_to_cell(world_sim, neighbour.index, cast.strength)
+	world_sim.force_tick()
 
 
 func _physics_process(delta: float) -> void:

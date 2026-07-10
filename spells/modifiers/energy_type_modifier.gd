@@ -5,8 +5,8 @@ enum Type { THERMAL, ELECTRICAL, ARCANE }
 
 const COOLDOWN_ADJUSTMENT: Dictionary = {
 	Type.THERMAL:     0.0,
-	Type.ELECTRICAL:  0.5,
-	Type.ARCANE:      1.5,
+	Type.ELECTRICAL:  0.0,
+	Type.ARCANE:      0.0,
 }
 
 @export var type: Type = Type.THERMAL
