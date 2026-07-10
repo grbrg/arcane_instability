@@ -2,6 +2,7 @@ class_name Player
 extends Character
 
 const CAST_PROJECTILE_SCENE = preload("res://spells/cast_projectile.tscn")
+const _Registry := preload("res://core/build_registry.gd")
 
 @export var device_id: int = -1
 @export var level: Level
@@ -31,6 +32,8 @@ func _ready() -> void:
 	_assign_cast(SLOT_IMPULSE, ImpulseCast.new())
 	_assign_cast(SLOT_STRUCTURE, StructureCast.new())
 	_assign_cast(SLOT_CONDUCTION, ConductionCast.new())
+
+	_apply_build()
 
 	_controller = FaceButtonsPlayerController.new(self)
 
@@ -152,3 +155,70 @@ func _process_casts(delta: float) -> void:
 			cast.process(delta, global_position, facing)
 	if _active_cast != null and not _active_cast.is_active:
 		_active_cast = null
+
+
+func _apply_build() -> void:
+	if device_id < 0 or device_id >= _Registry.builds.size():
+		return
+	var build: Dictionary = _Registry.builds[device_id]
+	var cast_mods: Dictionary = build.get("casts", {})
+	var cast_map := {
+		"Energy": SLOT_ENERGY,
+		"Conduction": SLOT_CONDUCTION,
+		"Impulse": SLOT_IMPULSE,
+		"Structure": SLOT_STRUCTURE,
+	}
+	for cast_name: String in cast_map:
+		var cast: Cast = _casts[cast_map[cast_name]]
+		if cast == null or not cast_mods.has(cast_name):
+			continue
+		_apply_cast_modifiers(cast, cast_mods[cast_name])
+
+
+func _apply_cast_modifiers(cast: Cast, mods: Dictionary) -> void:
+	if mods.has("area"):
+		if cast.area_modifier == null:
+			cast.area_modifier = AreaModifier.new()
+		cast.area_modifier.target_area = _area_val(mods["area"])
+	if mods.has("distance"):
+		if cast.distance_modifier == null:
+			cast.distance_modifier = DistanceModifier.new()
+		cast.distance_modifier.distance = _distance_val(mods["distance"])
+	if mods.has("energy_type"):
+		if cast.energy_type_modifier == null:
+			cast.energy_type_modifier = EnergyTypeModifier.new()
+		cast.energy_type_modifier.type = _energy_type_val(mods["energy_type"])
+	if mods.has("extension"):
+		if cast.extension_modifier == null:
+			cast.extension_modifier = ExtensionModifier.new()
+		cast.extension_modifier.extension = _extension_val(mods["extension"])
+
+
+static func _area_val(s: String) -> AreaModifier.TargetArea:
+	match s:
+		"PROJECTILE": return AreaModifier.TargetArea.PROJECTILE
+		"BEAM":       return AreaModifier.TargetArea.BEAM
+		"AREA":       return AreaModifier.TargetArea.AREA
+	return AreaModifier.TargetArea.POINT
+
+
+static func _distance_val(s: String) -> DistanceModifier.Distance:
+	match s:
+		"SHORT":  return DistanceModifier.Distance.SHORT
+		"MIDDLE": return DistanceModifier.Distance.MIDDLE
+		"FAR":    return DistanceModifier.Distance.FAR
+	return DistanceModifier.Distance.AROUND_PLAYER
+
+
+static func _energy_type_val(s: String) -> EnergyTypeModifier.Type:
+	match s:
+		"ELECTRICAL": return EnergyTypeModifier.Type.ELECTRICAL
+		"ARCANE":     return EnergyTypeModifier.Type.ARCANE
+	return EnergyTypeModifier.Type.THERMAL
+
+
+static func _extension_val(s: String) -> ExtensionModifier.Extension:
+	match s:
+		"BOUNCING":  return ExtensionModifier.Extension.BOUNCING
+		"EXPLOSION": return ExtensionModifier.Extension.EXPLOSION
+	return ExtensionModifier.Extension.PIERCING

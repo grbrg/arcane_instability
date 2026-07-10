@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "_comment": "Set availability values to false to disable a modifier option in Build Selection. Invalid combination rules use 'when' (required current selection) and 'disallow' (values to block when the 'when' condition matches).",
+  "availability": {
+    "area": {
+      "POINT": true,
+      "PROJECTILE": true,
+      "BEAM": true,
+      "AREA": true
+    },
+    "distance": {
+      "AROUND_PLAYER": true,
+      "SHORT": true,
+      "MIDDLE": true,
+      "FAR": true
+    },
+    "energy_type": {
+      "THERMAL": true,
+      "ELECTRICAL": true,
+      "ARCANE": true
+    },
+    "extension": {
+      "BOUNCING": true,
+      "PIERCING": true,
+      "EXPLOSION": true
+    }
+  },
+  "invalid_combinations": [
+    {
+      "description": "AROUND_PLAYER has zero range — a POINT target would always land on the caster with no effect",
+      "when": { "distance": "AROUND_PLAYER" },
+      "disallow": { "area": ["POINT"] }
+    },
+    {
+      "description": "BEAM requires a forward direction; AROUND_PLAYER has no directional component",
+      "when": { "area": "BEAM" },
+      "disallow": { "distance": ["AROUND_PLAYER"] }
+    }
+  ]
+}

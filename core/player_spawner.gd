@@ -1,6 +1,8 @@
 class_name PlayerSpawner
 extends Node3D
 
+const _Registry := preload("res://core/build_registry.gd")
+
 
 signal player_spawned(player: Player)
 signal player_died(device_id: int)
@@ -33,8 +35,14 @@ func _spawn_player(device_id: int) -> void:
 	player.device_id = device_id
 	player.level = level
 	player.ready.connect(func():
-		if device_id < player_colors.size():
-			player.set_player_color(player_colors[device_id])
+		var color: Color
+		if device_id < _Registry.builds.size():
+			color = _Registry.builds[device_id].get("color", Color.WHITE)
+		elif device_id < player_colors.size():
+			color = player_colors[device_id]
+		else:
+			color = Color.WHITE
+		player.set_player_color(color)
 		if world_simulation:
 			world_simulation.register_character(player)
 		if level:
