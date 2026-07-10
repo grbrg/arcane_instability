@@ -79,12 +79,19 @@ var _invalid_rules: Array = []
 var _player_data: Array = []
 var _player_ui: Array = []
 
+var _back_btn: Button = null
+var _start_btn: Button = null
+var _navs: Array = []         # per-player nav state dicts
+var _joy_cooldown: Array = [] # per-player axis cooldown (seconds)
+
 
 func _ready() -> void:
 	_load_config()
 	_init_player_data()
 	_load_saved()
 	_build_ui()
+	await get_tree().process_frame
+	_setup_navigation()
 
 
 func _load_config() -> void:
@@ -233,17 +240,17 @@ func _add_bottom_bar(parent: Control) -> void:
 	spacer_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(spacer_l)
 
-	var back_btn := Button.new()
-	back_btn.text = "Back"
-	back_btn.custom_minimum_size = Vector2(140, 44)
-	back_btn.pressed.connect(_on_back_pressed)
-	hbox.add_child(back_btn)
+	_back_btn = Button.new()
+	_back_btn.text = "Back"
+	_back_btn.custom_minimum_size = Vector2(140, 44)
+	_back_btn.pressed.connect(_on_back_pressed)
+	hbox.add_child(_back_btn)
 
-	var start_btn := Button.new()
-	start_btn.text = "Start"
-	start_btn.custom_minimum_size = Vector2(140, 44)
-	start_btn.pressed.connect(_on_start_pressed)
-	hbox.add_child(start_btn)
+	_start_btn = Button.new()
+	_start_btn.text = "Start"
+	_start_btn.custom_minimum_size = Vector2(140, 44)
+	_start_btn.pressed.connect(_on_start_pressed)
+	hbox.add_child(_start_btn)
 
 	var spacer_r := Control.new()
 	spacer_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -289,10 +296,12 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 
 	var ui: Dictionary = {
 		"card_style": card_style,
+		"scroll": scroll,
 		"name_edit": null,
 		"color_buttons": [],
 		"options": {},
 		"warnings": {},
+		"cooldown_labels": {},
 	}
 
 	# --- Player name ---
@@ -353,6 +362,7 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 	load_btn.custom_minimum_size.y = 34
 	load_btn.pressed.connect(_on_load_build.bind(player_idx))
 	btn_row.add_child(load_btn)
+	ui["load_btn"] = load_btn
 
 	var save_btn := Button.new()
 	save_btn.text = "Save Build"
@@ -360,6 +370,7 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 	save_btn.custom_minimum_size.y = 34
 	save_btn.pressed.connect(_on_save_build.bind(player_idx))
 	btn_row.add_child(save_btn)
+	ui["save_btn"] = save_btn
 
 	_player_ui.append(ui)
 
@@ -392,6 +403,12 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 	cast_label.add_theme_color_override("font_color", C_TITLE)
 	cast_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header_hbox.add_child(cast_label)
+
+	var cooldown_label := Label.new()
+	cooldown_label.add_theme_font_size_override("font_size", 13)
+	cooldown_label.add_theme_color_override("font_color", C_TEXT_DIM)
+	header_hbox.add_child(cooldown_label)
+	ui["cooldown_labels"][cast_name] = cooldown_label
 
 	var warn_label := Label.new()
 	warn_label.text = "Invalid combo"
@@ -509,6 +526,7 @@ func _validate_cast(player_idx: int, cast_name: String) -> void:
 
 	var ui: Dictionary = _player_ui[player_idx]
 	(ui["warnings"][cast_name] as Label).visible = not valid
+	(ui["cooldown_labels"][cast_name] as Label).text = "%.1fs" % _calc_cast_cooldown(cast_name, selection)
 
 	for mod_type in MODIFIER_TYPES:
 		var info: Dictionary = ui["options"][cast_name][mod_type]
@@ -517,6 +535,41 @@ func _validate_cast(player_idx: int, cast_name: String) -> void:
 		var bad: Array = disallowed.get(mod_type, [])
 		for i in values.size():
 			opt.set_item_disabled(i, values[i] in bad)
+
+
+func _calc_cast_cooldown(cast_name: String, mods: Dictionary) -> float:
+	var cast: Cast
+	match cast_name:
+		"Energy":     cast = EnergyCast.new()
+		"Conduction": cast = ConductionCast.new()
+		"Impulse":    cast = ImpulseCast.new()
+		"Structure":  cast = StructureCast.new()
+		_: return 0.0
+	for mod_type in MODIFIER_TYPES:
+		var val: String = mods.get(mod_type, "")
+		var idx: int = MODIFIER_VALUES[mod_type].find(val)
+		if idx < 0:
+			continue
+		match mod_type:
+			"area":
+				if cast.area_modifier == null:
+					cast.area_modifier = AreaModifier.new()
+				cast.area_modifier.target_area = idx as AreaModifier.TargetArea
+			"distance":
+				if cast.distance_modifier == null:
+					cast.distance_modifier = DistanceModifier.new()
+				cast.distance_modifier.distance = idx as DistanceModifier.Distance
+			"energy_type":
+				if cast.energy_type_modifier == null:
+					cast.energy_type_modifier = EnergyTypeModifier.new()
+				cast.energy_type_modifier.type = idx as EnergyTypeModifier.Type
+			"extension":
+				if cast.extension_modifier == null:
+					cast.extension_modifier = ExtensionModifier.new()
+				cast.extension_modifier.extension = idx as ExtensionModifier.Extension
+	var result := cast.cooldown
+	cast.free()
+	return result
 
 
 func _on_load_build(_player_idx: int) -> void:
@@ -544,6 +597,170 @@ func _write_to_registry() -> void:
 			"color": PLAYER_COLORS[_player_data[i]["color_index"]],
 			"casts": (_player_data[i]["casts"] as Dictionary).duplicate(true),
 		})
+
+
+# ---------------------------------------------------------------------------
+# Controller navigation
+# ---------------------------------------------------------------------------
+
+func _setup_navigation() -> void:
+	_navs.clear()
+	_joy_cooldown.clear()
+	# Remove any old cursors from a previous setup
+	for child in get_children():
+		if child.get_meta("nav_cursor", false):
+			child.queue_free()
+
+	for i in NUM_PLAYERS:
+		var ui: Dictionary = _player_ui[i]
+		var color: Color = PLAYER_COLORS[_player_data[i]["color_index"]]
+		var cbtns: Array = ui["color_buttons"]
+
+		var rows: Array = []
+		rows.append([ui["name_edit"]])
+		rows.append(cbtns.slice(0, 8))
+		rows.append(cbtns.slice(8, 16))
+		for cast_name in CAST_NAMES:
+			var opts: Dictionary = ui["options"][cast_name]
+			rows.append([opts["area"]["btn"],        opts["distance"]["btn"]])
+			rows.append([opts["energy_type"]["btn"], opts["extension"]["btn"]])
+		rows.append([ui["load_btn"], ui["save_btn"]])
+		if i == 0:
+			rows.append([_back_btn, _start_btn])
+
+		var cursor := _make_nav_cursor(color)
+		_navs.append({"rows": rows, "row": 0, "col": 0, "cursor": cursor,
+				"scroll": ui["scroll"]})
+		_joy_cooldown.append(0.0)
+
+	_nav_update_all_cursors()
+
+
+func _make_nav_cursor(color: Color) -> Panel:
+	var cursor := Panel.new()
+	cursor.set_meta("nav_cursor", true)
+	cursor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cursor.z_index = 100
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	style.set_border_width_all(3)
+	style.border_color = color
+	style.set_corner_radius_all(5)
+	cursor.add_theme_stylebox_override("panel", style)
+	add_child(cursor)
+	return cursor
+
+
+func _process(delta: float) -> void:
+	_nav_update_all_cursors()
+	for i in _navs.size():
+		if _joy_cooldown[i] > 0.0:
+			_joy_cooldown[i] -= delta
+			continue
+		var ax := Input.get_joy_axis(i, JOY_AXIS_LEFT_X)
+		var ay := Input.get_joy_axis(i, JOY_AXIS_LEFT_Y)
+		const DZ := 0.5
+		var dx := 1 if ax > DZ else (-1 if ax < -DZ else 0)
+		var dy := 1 if ay > DZ else (-1 if ay < -DZ else 0)
+		if dx != 0 or dy != 0:
+			_nav_move(i, dy, dx)
+			_joy_cooldown[i] = 0.18
+
+
+func _input(event: InputEvent) -> void:
+	if not event is InputEventJoypadButton or not (event as InputEventJoypadButton).pressed:
+		return
+	var dev := (event as InputEventJoypadButton).device
+	if dev < 0 or dev >= _navs.size():
+		return
+	match (event as InputEventJoypadButton).button_index:
+		JOY_BUTTON_DPAD_UP:    _nav_move(dev, -1,  0)
+		JOY_BUTTON_DPAD_DOWN:  _nav_move(dev,  1,  0)
+		JOY_BUTTON_DPAD_LEFT:  _nav_move(dev,  0, -1)
+		JOY_BUTTON_DPAD_RIGHT: _nav_move(dev,  0,  1)
+		JOY_BUTTON_A:          _nav_activate(dev)
+
+
+func _nav_move(player_idx: int, dy: int, dx: int) -> void:
+	var nav: Dictionary = _navs[player_idx]
+	var rows: Array = nav["rows"]
+
+	if dy != 0:
+		var new_row: int = clampi(nav["row"] + dy, 0, rows.size() - 1)
+		var row_size: int = (rows[new_row] as Array).size()
+		nav["row"] = new_row
+		nav["col"] = clampi(nav["col"], 0, row_size - 1)
+		var scroll := nav["scroll"] as ScrollContainer
+		if scroll:
+			var target := (rows[new_row] as Array)[nav["col"]] as Control
+			scroll.ensure_control_visible(target)
+	else:
+		var row_size: int = (rows[nav["row"]] as Array).size()
+		nav["col"] = clampi(nav["col"] + dx, 0, row_size - 1)
+
+	_nav_update_all_cursors()
+
+
+func _nav_activate(player_idx: int) -> void:
+	var nav: Dictionary = _navs[player_idx]
+	var rows: Array = nav["rows"]
+	var row: int = nav["row"]
+	var col: int = nav["col"]
+	if row >= rows.size():
+		return
+	var r: Array = rows[row]
+	if col >= r.size():
+		return
+	var target: Control = r[col]
+	if target is OptionButton:
+		_cycle_option(target as OptionButton, 1)
+	elif target is Button:
+		(target as Button).pressed.emit()
+	elif target is LineEdit:
+		(target as LineEdit).grab_focus()
+
+
+func _cycle_option(opt: OptionButton, direction: int) -> void:
+	var count := opt.get_item_count()
+	if count < 2:
+		return
+	var current := opt.get_selected()
+	var next := current
+	for _i in count:
+		next = (next + direction + count) % count
+		if not opt.is_item_disabled(next):
+			break
+	if next != current:
+		opt.select(next)
+		opt.item_selected.emit(next)
+
+
+func _nav_update_all_cursors() -> void:
+	for nav in _navs:
+		_nav_update_cursor(nav)
+
+
+func _nav_update_cursor(nav: Dictionary) -> void:
+	var cursor := nav["cursor"] as Panel
+	var rows: Array = nav["rows"]
+	var row: int = nav["row"]
+	var col: int = nav["col"]
+	if row >= rows.size():
+		cursor.visible = false
+		return
+	var r: Array = rows[row]
+	if col >= r.size():
+		cursor.visible = false
+		return
+	var target := r[col] as Control
+	if not is_instance_valid(target) or not target.is_visible_in_tree():
+		cursor.visible = false
+		return
+	var rect := target.get_global_rect()
+	var origin := get_global_rect().position
+	cursor.position = rect.position - origin - Vector2(2.0, 2.0)
+	cursor.size = rect.size + Vector2(4.0, 4.0)
+	cursor.visible = true
 
 
 # ---------------------------------------------------------------------------
