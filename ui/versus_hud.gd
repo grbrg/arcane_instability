@@ -168,12 +168,10 @@ func _create_player_card(device_id: int, color: Color) -> void:
 
 
 func _build_ui() -> void:
-	var theme := _create_theme()
-
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.theme = theme
+	root.theme = preload("res://ui/theme.tres")
 	add_child(root)
 
 	_build_score_panel(root)
@@ -234,22 +232,3 @@ func _build_player_panel(root: Control) -> void:
 	panel.add_child(_player_cards_container)
 
 
-func _create_theme() -> Theme:
-	var theme := Theme.new()
-
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.04, 0.03, 0.12, 0.85)
-	panel_style.set_border_width_all(2)
-	panel_style.border_color = Color(0.55, 0.25, 0.95, 1.0)
-	panel_style.set_corner_radius_all(6)
-	panel_style.set_content_margin_all(10.0)
-	theme.set_stylebox("panel", "PanelContainer", panel_style)
-
-	theme.set_color("font_color", "Label", Color(0.92, 0.88, 1.0))
-	theme.set_font_size("font_size", "Label", 18)
-
-	var sep_style := StyleBoxFlat.new()
-	sep_style.bg_color = Color(0.55, 0.25, 0.95, 0.5)
-	theme.set_stylebox("separator", "VSeparator", sep_style)
-
-	return theme

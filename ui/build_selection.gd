@@ -58,18 +58,18 @@ const PLAYER_COLORS := [
 
 const NUM_PLAYERS := 4
 
-const C_BG         := Color(0.02, 0.01, 0.08)
-const C_PANEL      := Color(0.04, 0.03, 0.12, 0.95)
-const C_SECTION_BG := Color(0.07, 0.05, 0.18)
-const C_BORDER     := Color(0.55, 0.25, 0.95)
-const C_BORDER_DIM := Color(0.35, 0.15, 0.65)
-const C_TEXT       := Color(0.92, 0.88, 1.0)
-const C_TEXT_DIM   := Color(0.55, 0.50, 0.70)
-const C_TITLE      := Color(0.75, 0.40, 1.0)
-const C_HOVER      := Color(0.08, 0.06, 0.20)
-const C_PRESSED    := Color(0.14, 0.08, 0.32)
-const C_WARNING    := Color(1.0,  0.60, 0.00)
-const C_BTN_NORMAL := Color(0.06, 0.04, 0.16)
+const C_BG         := Color(0.03, 0.02, 0.01)
+const C_PANEL      := Color(0.07, 0.06, 0.04, 0.93)
+const C_SECTION_BG := Color(0.10, 0.09, 0.06)
+const C_BORDER     := Color(0.75, 0.55, 0.10)
+const C_BORDER_DIM := Color(0.35, 0.26, 0.06)
+const C_TEXT       := Color(0.90, 0.87, 0.78)
+const C_TEXT_DIM   := Color(0.52, 0.48, 0.36)
+const C_TITLE      := Color(0.88, 0.70, 0.20)
+const C_HOVER      := Color(0.13, 0.11, 0.07)
+const C_PRESSED    := Color(0.22, 0.16, 0.05)
+const C_WARNING    := Color(0.95, 0.35, 0.10)
+const C_BTN_NORMAL := Color(0.08, 0.07, 0.04)
 
 const _Validator := preload("res://spells/modifiers/modifier_validator.gd")
 const _Registry := preload("res://core/build_registry.gd")
@@ -179,7 +179,7 @@ func _save() -> void:
 # ---------------------------------------------------------------------------
 
 func _build_ui() -> void:
-	theme = _create_theme()
+	theme = preload("res://ui/theme.tres")
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 	var bg := ColorRect.new()
@@ -258,13 +258,7 @@ func _add_bottom_bar(parent: Control) -> void:
 
 
 func _make_h_separator() -> HSeparator:
-	var sep := HSeparator.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = C_BORDER_DIM
-	style.content_margin_top = 1.0
-	style.content_margin_bottom = 1.0
-	sep.add_theme_stylebox_override("separator", style)
-	return sep
+	return HSeparator.new()
 
 
 func _create_player_card(player_idx: int, parent: Control) -> void:
@@ -276,9 +270,9 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 
 	var card_style := StyleBoxFlat.new()
 	card_style.bg_color = C_PANEL
-	card_style.set_border_width_all(2)
+	card_style.set_border_width_all(1)
 	card_style.border_color = player_color
-	card_style.set_corner_radius_all(8)
+	card_style.set_corner_radius_all(0)
 	card_style.set_content_margin_all(10.0)
 	card_panel.add_theme_stylebox_override("panel", card_style)
 	parent.add_child(card_panel)
@@ -384,7 +378,7 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 	section_style.bg_color = C_SECTION_BG
 	section_style.set_border_width_all(1)
 	section_style.border_color = C_BORDER_DIM
-	section_style.set_corner_radius_all(4)
+	section_style.set_corner_radius_all(0)
 	section_style.set_content_margin_all(6.0)
 	section_panel.add_theme_stylebox_override("panel", section_style)
 	parent.add_child(section_panel)
@@ -643,9 +637,9 @@ func _make_nav_cursor(color: Color) -> Panel:
 	cursor.z_index = 100
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
-	style.set_border_width_all(3)
+	style.set_border_width_all(2)
 	style.border_color = color
-	style.set_corner_radius_all(5)
+	style.set_corner_radius_all(0)
 	cursor.add_theme_stylebox_override("panel", style)
 	add_child(cursor)
 	return cursor
@@ -763,80 +757,3 @@ func _nav_update_cursor(nav: Dictionary) -> void:
 	cursor.visible = true
 
 
-# ---------------------------------------------------------------------------
-# Theme
-# ---------------------------------------------------------------------------
-
-func _create_theme() -> Theme:
-	var theme := Theme.new()
-
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = C_PANEL
-	panel_style.set_border_width_all(2)
-	panel_style.border_color = C_BORDER
-	panel_style.set_corner_radius_all(6)
-	panel_style.set_content_margin_all(10.0)
-	theme.set_stylebox("panel", "PanelContainer", panel_style)
-
-	theme.set_color("font_color", "Label", C_TEXT)
-	theme.set_font_size("font_size", "Label", 16)
-
-	var btn_normal := StyleBoxFlat.new()
-	btn_normal.bg_color = C_BTN_NORMAL
-	btn_normal.set_border_width_all(1)
-	btn_normal.border_color = C_BORDER_DIM
-	btn_normal.set_corner_radius_all(4)
-	btn_normal.set_content_margin_all(8.0)
-
-	var btn_hover := btn_normal.duplicate() as StyleBoxFlat
-	btn_hover.bg_color = C_HOVER
-	btn_hover.border_color = C_BORDER
-
-	var btn_pressed := btn_normal.duplicate() as StyleBoxFlat
-	btn_pressed.bg_color = C_PRESSED
-	btn_pressed.border_color = C_BORDER
-
-	var btn_focus := StyleBoxEmpty.new()
-
-	theme.set_stylebox("normal",   "Button", btn_normal)
-	theme.set_stylebox("hover",    "Button", btn_hover)
-	theme.set_stylebox("pressed",  "Button", btn_pressed)
-	theme.set_stylebox("focus",    "Button", btn_focus)
-	theme.set_stylebox("disabled", "Button", btn_normal.duplicate())
-	theme.set_color("font_color",          "Button", C_TEXT)
-	theme.set_color("font_disabled_color", "Button", C_TEXT_DIM)
-	theme.set_font_size("font_size",       "Button", 15)
-
-	theme.set_stylebox("normal",   "OptionButton", btn_normal.duplicate())
-	theme.set_stylebox("hover",    "OptionButton", btn_hover.duplicate())
-	theme.set_stylebox("pressed",  "OptionButton", btn_pressed.duplicate())
-	theme.set_stylebox("focus",    "OptionButton", btn_focus.duplicate())
-	theme.set_color("font_color",          "OptionButton", C_TEXT)
-	theme.set_color("font_disabled_color", "OptionButton", C_TEXT_DIM)
-	theme.set_font_size("font_size",       "OptionButton", 13)
-
-	var le_normal := StyleBoxFlat.new()
-	le_normal.bg_color = Color(0.05, 0.04, 0.15)
-	le_normal.set_border_width_all(1)
-	le_normal.border_color = C_BORDER_DIM
-	le_normal.set_corner_radius_all(4)
-	le_normal.set_content_margin_all(8.0)
-
-	var le_focus := le_normal.duplicate() as StyleBoxFlat
-	le_focus.border_color = C_BORDER
-
-	theme.set_stylebox("normal", "LineEdit", le_normal)
-	theme.set_stylebox("focus",  "LineEdit", le_focus)
-	theme.set_color("font_color",      "LineEdit", C_TEXT)
-	theme.set_color("caret_color",     "LineEdit", C_TITLE)
-	theme.set_color("selection_color", "LineEdit", Color(0.55, 0.25, 0.95, 0.4))
-	theme.set_font_size("font_size",   "LineEdit", 18)
-
-	var sep_style := StyleBoxFlat.new()
-	sep_style.bg_color = C_BORDER_DIM
-	sep_style.content_margin_top = 1.0
-	sep_style.content_margin_bottom = 1.0
-	theme.set_stylebox("separator", "HSeparator", sep_style)
-	theme.set_stylebox("separator", "VSeparator", sep_style)
-
-	return theme
