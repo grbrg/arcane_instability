@@ -8,7 +8,7 @@ func _init() -> void:
 	energy_type_modifier = EnergyTypeModifier.new()
 	energy_type_modifier.type = EnergyTypeModifier.Type.THERMAL
 	distance_modifier = DistanceModifier.new()
-	distance_modifier.distance = DistanceModifier.Distance.AROUND_PLAYER
+	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
 	area_modifier = AreaModifier.new()
 	area_modifier.target_area = AreaModifier.TargetArea.POINT
 

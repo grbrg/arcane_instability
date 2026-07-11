@@ -5,11 +5,19 @@ extends Node3D
 
 const ARRIVAL_THRESHOLD := 0.3
 
+const _BOUNCE_DIRS: Array[Vector3i] = [
+	Vector3i( 1, 0,  0), Vector3i(-1, 0,  0),
+	Vector3i( 0, 0,  1), Vector3i( 0, 0, -1),
+	Vector3i( 1, 0,  1), Vector3i( 1, 0, -1),
+	Vector3i(-1, 0,  1), Vector3i(-1, 0, -1),
+]
+
 var _cast: Cast
 var _target_position: Vector3
 var _world_simulation: WorldSimulation
 var _arrived: bool = false
 var _last_radiated_cell: Vector3i = Vector3i.MIN
+var _is_shard: bool = false
 
 
 func setup(cast: Cast, target: Vector3, world_sim: WorldSimulation) -> void:
@@ -47,6 +55,35 @@ func _try_radiate() -> void:
 
 func _arrive() -> void:
 	_arrived = true
-	_cast.resolve(_world_simulation)
+	if _is_shard:
+		var grid := _world_simulation.grid
+		var cell := grid.local_to_map(grid.to_local(global_position))
+		cell.y = _cast.resolve_cell.y
+		_cast.apply_to_cell(_world_simulation, cell, _cast.strength)
+	else:
+		_cast.resolve(_world_simulation)
+		_spawn_bounce_shards()
 	_world_simulation.force_tick()
 	queue_free()
+
+
+func _spawn_bounce_shards() -> void:
+	if _cast.extension_modifier == null:
+		return
+	if _cast.extension_modifier.extension != ExtensionModifier.Extension.BOUNCING:
+		return
+	var shard_scene := load("res://spells/cast_projectile.tscn") as PackedScene
+	var grid := _world_simulation.grid
+	var origin_cell := _cast.resolve_cell
+	for dir in _BOUNCE_DIRS:
+		if randf() > 0.75:
+			continue
+		var dist := randi_range(1, 2)
+		var target_cell: Vector3i = origin_cell + dir * dist
+		var target_world: Vector3 = grid.to_global(grid.map_to_local(target_cell))
+		target_world.y = global_position.y
+		var shard := shard_scene.instantiate() as CastProjectile
+		shard._is_shard = true
+		get_parent().add_child(shard)
+		shard.global_position = global_position
+		shard.setup(_cast, target_world, _world_simulation)
