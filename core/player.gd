@@ -35,7 +35,7 @@ func _ready() -> void:
 
 	_apply_build()
 
-	_controller = FaceButtonsPlayerController.new(self)
+	_controller = TwinstickPlayerController.new(self)
 
 	var snaps := _controller.snaps_cast_to_distance()
 	var shows_marker := _controller.uses_cast_marker()

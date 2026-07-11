@@ -1,6 +1,10 @@
 class_name TwinstickPlayerController
 extends PlayerController
 
+func uses_cast_marker() -> bool:
+	return false
+
+
 func snaps_cast_to_distance() -> bool:
 	return true
 
@@ -28,8 +32,6 @@ func _update_aim(device_id: int, camera: Camera3D) -> void:
 		var cam_right := Vector3(basis.x.x, 0.0, basis.x.z).normalized()
 		aim_dir = (cam_right * raw.x - cam_forward * raw.y).normalized()
 	set_aim_input(aim_dir)
-	if aim_dir != Vector3.ZERO:
-		_player.redirect_active_cast(aim_dir)
 
 
 func _update_cast_inputs(device_id: int) -> void:

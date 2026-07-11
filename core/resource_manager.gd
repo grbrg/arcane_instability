@@ -4,7 +4,7 @@ extends Node
 
 
 
-@onready var grass_scene = preload("res://world/ground/grass/grass.tscn")
+#@onready var grass_scene = preload("res://world/ground/grass/grass.tscn")
 
 @onready var ground_scene = preload("res://world/ground/ground.tscn")
 

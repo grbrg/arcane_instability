@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://bv3lv2ptw3ygv"]
+
+[ext_resource type="Script" uid="uid://dr76huuhf0ir2" path="res://world/world_object.gd" id="1_1cc12"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1cc12"]
+size = Vector3(0.5, 0.1, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hfyow"]
+albedo_color = Color(0.50411224, 0.3325558, 1.92523e-07, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_e2is3"]
+size = Vector3(0.5, 0.05, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_l3fvf"]
+size = Vector3(0.5, 0.05, 0.05)
+
+[node name="WoodPile" type="Node3D" unique_id=1405634277]
+script = ExtResource("1_1cc12")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1836650865]
+transform = Transform3D(0.72341317, 0, 0.6904154, 0, 1, 0, -0.6904154, 0, 0.72341317, 0, 0.05039969, 0)
+mesh = SubResource("BoxMesh_1cc12")
+surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="." unique_id=1239310492]
+transform = Transform3D(0.9897089, 0, 0.14309534, 0, 1, 0, -0.14309534, 0, 0.9897089, 0, 0.05039969, 0.08299792)
+mesh = SubResource("BoxMesh_1cc12")
+surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1008421774]
+transform = Transform3D(-0.5238474, 0.41428027, 0.744282, 0.23844399, 0.91014934, -0.33878106, -0.81775814, 0, -0.575562, 0.11421591, 0.11774579, 0)
+mesh = SubResource("BoxMesh_e2is3")
+surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="." unique_id=952812887]
+transform = Transform3D(0.5064272, 0.18112749, 0.8430447, 0.23844405, 0.91014946, -0.33878106, -0.8286591, 0.37258685, 0.41773564, 0.038780093, 0.11774579, 0)
+mesh = SubResource("BoxMesh_l3fvf")
+surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="." unique_id=1932878988]
+transform = Transform3D(0.79162484, -0.5504052, -0.26529974, 0.42507094, 0.80800676, -0.40797037, 0.4389131, 0.21018843, 0.8735997, 0.0033231974, 0.11774579, 0)
+mesh = SubResource("BoxMesh_1cc12")
+surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")

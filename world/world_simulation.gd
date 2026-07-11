@@ -20,12 +20,17 @@ var _time_since_tick: float
 var _characters: Array[Character] = []
 var _character_cells: Dictionary = {}  # Character -> Vector3i
 
+var _world_objects: Array[WorldObject] = []
+var _world_object_cells: Dictionary = {}  # WorldObject -> Vector3i
+
 
 func _ready() -> void:
 	_ambient = Ambient.new()
 	_reset_grid()
 
 	_time_since_tick = 0.0
+
+	call_deferred("_assign_world_objects_to_cells")
 
 
 ##
@@ -36,10 +41,7 @@ func _reset_grid():
 
 		# first add all cells
 		for cell_index in cell_indices:
-			var item = grid.get_cell_item(cell_index)
-			var subst = biome.get_substance(item)
-
-			var new_cell = GridCell.new(cell_index, grid, subst)
+			var new_cell = GridCell.new(cell_index, grid)
 			new_cell.ambient = _ambient
 
 			_cells[cell_index] = new_cell
@@ -58,6 +60,32 @@ func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
 	if neighbour in _cells:
 		var neighbour_cell = _cells[neighbour]
 		cell.neighbours.append(neighbour_cell)
+
+
+## Scan the scene tree for all WorldObject nodes and assign them to their grid cells.
+func _assign_world_objects_to_cells() -> void:
+	var wos = get_tree().get_nodes_in_group("world_objects")
+	for wo in wos:
+		if wo is WorldObject:
+			register_world_object(wo)
+	_update_world_object_cells()
+
+
+func register_world_object(wo: WorldObject) -> void:
+	if wo == null or not is_instance_valid(wo):
+		return
+	if not wo in _world_objects:
+		_world_objects.append(wo)
+		wo.tree_exiting.connect(func(): unregister_world_object(wo))
+
+
+func unregister_world_object(wo: WorldObject) -> void:
+	_world_objects.erase(wo)
+	var old_index: Vector3i = _world_object_cells.get(wo, Vector3i.MIN)
+	if old_index != Vector3i.MIN and old_index in _cells:
+		_cells[old_index].remove_world_object(wo)
+	_world_object_cells.erase(wo)
+
 
 func register_character(character: Character) -> void:
 	if character == null or not is_instance_valid(character):
@@ -82,6 +110,7 @@ func _world_to_grid(world_pos: Vector3) -> Vector3i:
 ##
 func _process(delta: float) -> void:
 	_update_character_cells()
+	_update_world_object_cells()
 	_time_since_tick += delta
 
 	if _time_since_tick > TICK_TIME:
@@ -100,6 +129,21 @@ func _update_character_cells() -> void:
 		if new_index in _cells:
 			_cells[new_index].add_character(character)
 		_character_cells[character] = new_index
+
+
+func _update_world_object_cells() -> void:
+	for wo in _world_objects:
+		var new_index := _world_to_grid(wo.global_position)
+		var old_index: Vector3i = _world_object_cells.get(wo, Vector3i.MIN)
+		if new_index == old_index:
+			continue
+		if old_index != Vector3i.MIN and old_index in _cells:
+			_cells[old_index].remove_world_object(wo)
+		var new_cell: GridCell = _cells.get(new_index, null)
+		if new_cell:
+			new_cell.add_world_object(wo)
+		wo.set_current_cell(new_cell)
+		_world_object_cells[wo] = new_index
 
 
 func add_cast_to_resolve(cast: Cast) -> void:
@@ -138,15 +182,6 @@ func get_grid_index(pos: Vector2) -> Vector3i:
 
 ##
 func _tick(delta: float) -> void:
-	# Step 1: resolve spells first
-	# Step 2: Update each cell's entities, e. g. temperature slowly goes to down/up
-	# 	Step 3: Transfer to neighbours
-	# 	Step 4: Check substance reactions
-	# 	Step 5: Create new states
-	# 	Step 6: Calculate damage
-	# 	Step 7: Reduce HP
-	# 	Step 8: Decay
-
 	for cast in _casts_to_resolve:
 		cast.resolve(self)
 	_casts_to_resolve.clear()
@@ -160,6 +195,3 @@ func _tick(delta: float) -> void:
 
 	for index in _cells:
 		_cells[index].diffuse()
-	
-
-	

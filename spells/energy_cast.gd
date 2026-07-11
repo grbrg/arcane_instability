@@ -10,7 +10,7 @@ func _init() -> void:
 	distance_modifier = DistanceModifier.new()
 	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
 	area_modifier = AreaModifier.new()
-	area_modifier.target_area = AreaModifier.TargetArea.POINT
+	area_modifier.target_area = AreaModifier.TargetArea.AREA
 
 
 func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: float) -> void:

@@ -17,6 +17,7 @@ var _target_position: Vector3
 var _world_simulation: WorldSimulation
 var _arrived: bool = false
 var _last_radiated_cell: Vector3i = Vector3i.MIN
+var _affected_cells: Dictionary = {}
 var _is_shard: bool = false
 
 
@@ -44,13 +45,18 @@ func _try_radiate() -> void:
 	current_cell.y = _cast.resolve_cell.y
 	if current_cell == _last_radiated_cell:
 		return
+	_last_radiated_cell = current_cell
+	if _affected_cells.has(current_cell):
+		return
 	if _world_simulation.get_cell(current_cell) == null:
 		return
-	_last_radiated_cell = current_cell
+	_affected_cells[current_cell] = true
 	var is_beam := _cast.area_modifier != null \
 		and _cast.area_modifier.target_area == AreaModifier.TargetArea.BEAM
 	var radiate_strength := _cast.strength if is_beam else 0.5
 	_cast.apply_to_cell(_world_simulation, current_cell, radiate_strength)
+	if is_beam:
+		_world_simulation.force_tick()
 
 
 func _arrive() -> void:

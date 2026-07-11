@@ -56,19 +56,18 @@ func take_stress(total_energy: float, impulse: float) -> void:
 	health.take_damage(damage)
 
 
-## Sums all energy channels on the given cell and applies stress to this character.
+## Sums all energy channels across all world objects on the given cell and applies stress.
 func apply_stress_from_cell(cell: GridCell) -> void:
 	var energy_sum := 0.0
-	for key in cell.entity.properties:
-		var prop = cell.entity.properties[key]
-		if prop is EnergyProperty:
-			energy_sum += prop.get_value()
-
 	var impulse := 0.0
-	var impulse_prop = cell.entity.get_property("impulse")
-	if impulse_prop is ImpulseProperty:
-		impulse = impulse_prop.get_vector().length()
-
+	for wo in cell.world_objects:
+		for key in wo.entity.properties:
+			var prop = wo.entity.properties[key]
+			if prop is EnergyProperty:
+				energy_sum += prop.get_value()
+		var impulse_prop = wo.entity.get_property("impulse")
+		if impulse_prop is ImpulseProperty:
+			impulse += impulse_prop.get_vector().length()
 	take_stress(energy_sum, impulse)
 
 

@@ -1,5 +1,5 @@
 class_name Grass
-extends Ground
+extends WorldObject
 
 
 
