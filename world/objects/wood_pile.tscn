@@ -16,6 +16,7 @@ size = Vector3(0.5, 0.05, 0.05)
 
 [node name="WoodPile" type="Node3D" unique_id=1405634277]
 script = ExtResource("1_1cc12")
+moveable = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1836650865]
 transform = Transform3D(0.72341317, 0, 0.6904154, 0, 1, 0, -0.6904154, 0, 0.72341317, 0, 0.05039969, 0)

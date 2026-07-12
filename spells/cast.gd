@@ -1,7 +1,7 @@
 class_name Cast
 extends Node
 
-enum Axis { ENERGY, IMPULSE, STRUCTURE, CONDUCTION }
+enum Axis { ENERGY, PRESSURE, STRUCTURE, CONDUCTION }
 
 var axis: Axis = Axis.ENERGY
 var energy_channel: EnergyChannelModule = null

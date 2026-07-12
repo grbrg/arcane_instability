@@ -80,8 +80,8 @@ func _update_cast_inputs(device_id: int) -> void:
 		if r2: _player.request_cast(Player.SLOT_ENERGY)
 		else:  _player.release_cast(Player.SLOT_ENERGY)
 	if r1 != _r1_pressed:
-		if r1: _player.request_cast(Player.SLOT_IMPULSE)
-		else:  _player.release_cast(Player.SLOT_IMPULSE)
+		if r1: _player.request_cast(Player.SLOT_PRESSURE)
+		else:  _player.release_cast(Player.SLOT_PRESSURE)
 	if l2 != _l2_pressed:
 		if l2: _player.request_cast(Player.SLOT_STRUCTURE)
 		else:  _player.release_cast(Player.SLOT_STRUCTURE)

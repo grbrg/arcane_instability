@@ -18,9 +18,9 @@ extends Node
 @export var arcane_conductivity: float = 0.5
 @export var arcane_decay: float = 0.1
 
-@export_category("Impulse")
-@export var impulse_conductivity: float = 0.5
-@export var impulse_decay: float = 0.3
+@export_category("Pressure")
+@export var pressure_conductivity: float = 0.5
+@export var pressure_decay: float = 0.85
 
 @export_category("Structure")
 @export var structure_value: float = 50.0
@@ -41,7 +41,7 @@ func create_properties() -> Dictionary:
 	properties["thermal"] = ThermalEnergy.new(0.0, thermal_capacity, thermal_conductivity, thermal_decay)
 	properties["electrical"] = ElectricalEnergy.new(0.0, electrical_capacity, electrical_conductivity, electrical_decay)
 	properties["arcane"] = ArcaneEnergy.new(0.0, arcane_capacity, arcane_conductivity, arcane_decay)
-	properties["impulse"] = ImpulseProperty.new(0.0, 1.0, impulse_conductivity, impulse_decay)
+	properties["pressure"] = PressureProperty.new(0.0, 1.0, pressure_conductivity, pressure_decay)
 	properties["structure"] = StructureProperty.new(structure_value, structure_recovery)
 	properties["conduction"] = ConductionProperty.new(conduction_value)
 

@@ -8,8 +8,8 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 @export var health_bar_offset: Vector3 = Vector3(0.0, 1.2, 0.0)
 ## Total energy (across all channels) a character can withstand before taking damage.
 @export var energy_tolerance: float = 0.5
-## Impulse a character can withstand before taking damage.
-@export var impulse_tolerance: float = 0.5
+## Pressure a character can withstand before taking damage.
+@export var pressure_tolerance: float = 0.5
 ## Multiplier applied to excess energy/impulse before dealing damage.
 @export var damage_scale: float = 20.0
 
@@ -51,24 +51,28 @@ func _ready() -> void:
 
 ## Called by the simulation each tick with current entity state totals.
 ## Damage = excess above tolerance, matching the system simulation loop (Step 6+7).
-func take_stress(total_energy: float, impulse: float) -> void:
-	var damage := (maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, impulse - impulse_tolerance)) * damage_scale
+func take_stress(total_energy: float, pressure: float) -> void:
+	var damage := (maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, pressure - pressure_tolerance)) * damage_scale
 	health.take_damage(damage)
 
 
 ## Sums all energy channels across all world objects on the given cell and applies stress.
 func apply_stress_from_cell(cell: GridCell) -> void:
 	var energy_sum := 0.0
-	var impulse := 0.0
+	var pressure := 0.0
 	for wo in cell.world_objects:
 		for key in wo.entity.properties:
 			var prop = wo.entity.properties[key]
-			if prop is EnergyProperty:
+			if prop is EnergyProperty and not (prop is PressureProperty):
 				energy_sum += prop.get_value()
-		var impulse_prop = wo.entity.get_property("impulse")
-		if impulse_prop is ImpulseProperty:
-			impulse += impulse_prop.get_vector().length()
-	take_stress(energy_sum, impulse)
+		var pressure_prop = wo.entity.get_property("pressure")
+		if pressure_prop:
+			pressure += pressure_prop.get_value()
+	take_stress(energy_sum, pressure)
+
+
+func apply_cell_impulse(impulse: Vector3) -> void:
+	velocity += impulse
 
 
 func apply_gravity(delta):

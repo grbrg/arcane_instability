@@ -62,6 +62,13 @@ func _reset_grid():
 			add_child(air_obj)
 			air_obj.global_position = grid.to_global(grid.map_to_local(cell_index))
 
+		# create a pressure indicator for each cell
+		for cell_index in cell_indices:
+			var indicator := ImpulseIndicator.new()
+			_cells[cell_index].impulse_indicator = indicator
+			_cells[cell_index].add_child(indicator)
+			indicator.global_position = grid.to_global(grid.map_to_local(cell_index))
+
 
 func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
 	if neighbour in _cells:
@@ -123,6 +130,9 @@ func _process(delta: float) -> void:
 	if _time_since_tick > TICK_TIME:
 		_tick(_time_since_tick)
 		_time_since_tick = 0.0
+
+	for index in _cells:
+		_cells[index].apply_frame_movement(delta)
 
 
 func _update_character_cells() -> void:
@@ -192,6 +202,14 @@ func _tick(delta: float) -> void:
 	for cast in _casts_to_resolve:
 		cast.resolve(self)
 	_casts_to_resolve.clear()
+
+	# Impulse is measured before decay/diffuse so the cast gradient is at full strength.
+	# Velocity kicks are applied once here; per-frame integration happens in _process.
+	for index in _cells:
+		var cell: GridCell = _cells[index]
+		var impulse := cell.compute_impulse()
+		cell.update_impulse(impulse)
+		cell.apply_impulse_to_objects(impulse)
 
 	for index in _cells:
 		var cell = _cells[index]

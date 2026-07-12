@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cd2m3rqh5kxo7"]
+
+[ext_resource type="Script" uid="uid://eiemxs2vlxvf" path="res://world/views/temperature_view.gd" id="1_3v220"]
+[ext_resource type="Shader" uid="uid://dm0phgf3y6575" path="res://world/views/temperature_view.gdshader" id="2_q5xr8"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_t62g3"]
+subdivide_width = 8
+subdivide_height = 8
+subdivide_depth = 8
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8vtoy"]
+render_priority = 0
+shader = ExtResource("2_q5xr8")
+
+[node name="TemperatureView" type="Node3D" unique_id=1159365705]
+script = ExtResource("1_3v220")
+metadata/_custom_type_script = "uid://eiemxs2vlxvf"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=247105221]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_t62g3")
+surface_material_override/0 = SubResource("ShaderMaterial_8vtoy")

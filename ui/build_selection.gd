@@ -6,7 +6,7 @@ const SAVE_PATH := "user://build_selections.cfg"
 const EXPERIMENTAL_STATION_SCENE := "res://levels/experimental/experimental_station.tscn"
 const TITLE_MENU_SCENE := "res://ui/TitleMenu.tscn"
 
-const CAST_NAMES := ["Energy", "Conduction", "Impulse", "Structure"]
+const CAST_NAMES := ["Energy", "Conduction", "Pressure", "Structure"]
 const MODIFIER_TYPES := ["area", "distance", "energy_type", "extension"]
 
 const MODIFIER_LABELS := {
@@ -537,7 +537,7 @@ func _calc_cast_cooldown(cast_name: String, mods: Dictionary) -> float:
 	match cast_name:
 		"Energy":     cast = EnergyCast.new()
 		"Conduction": cast = ConductionCast.new()
-		"Impulse":    cast = ImpulseCast.new()
+		"Pressure":   cast = PressureCast.new()
 		"Structure":  cast = StructureCast.new()
 		_: return 0.0
 	for mod_type in MODIFIER_TYPES:

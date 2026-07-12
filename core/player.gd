@@ -8,9 +8,9 @@ const _Registry := preload("res://core/build_registry.gd")
 @export var level: Level
 
 # Slot indices match Cast.Axis enum — fixed to shoulder buttons:
-# R2=ENERGY, R1=IMPULSE, L2=STRUCTURE, L1=CONDUCTION
+# R2=ENERGY, R1=PRESSURE, L2=STRUCTURE, L1=CONDUCTION
 const SLOT_ENERGY     = 0
-const SLOT_IMPULSE    = 1
+const SLOT_PRESSURE   = 1
 const SLOT_STRUCTURE  = 2
 const SLOT_CONDUCTION = 3
 
@@ -29,7 +29,7 @@ func _ready() -> void:
 
 	_casts.resize(4)
 	_assign_cast(SLOT_ENERGY, EnergyCast.new())
-	_assign_cast(SLOT_IMPULSE, ImpulseCast.new())
+	_assign_cast(SLOT_PRESSURE, PressureCast.new())
 	_assign_cast(SLOT_STRUCTURE, StructureCast.new())
 	_assign_cast(SLOT_CONDUCTION, ConductionCast.new())
 
@@ -165,7 +165,7 @@ func _apply_build() -> void:
 	var cast_map := {
 		"Energy": SLOT_ENERGY,
 		"Conduction": SLOT_CONDUCTION,
-		"Impulse": SLOT_IMPULSE,
+		"Pressure": SLOT_PRESSURE,
 		"Structure": SLOT_STRUCTURE,
 	}
 	for cast_name: String in cast_map:

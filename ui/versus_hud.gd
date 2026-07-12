@@ -135,7 +135,7 @@ func _create_player_card(device_id: int, color: Color) -> void:
 	spell_row.add_theme_constant_override("separation", 16)
 	vbox.add_child(spell_row)
 
-	var spell_names := ["E", "I", "S", "C"]
+	var spell_names := ["E", "P", "S", "C"]
 	var cooldown_indicators: Array = []
 	for i in 4:
 		var slot := VBoxContainer.new()

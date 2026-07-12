@@ -58,8 +58,8 @@ func _init() -> void:
 	air.arcane_capacity = 0.3
 	air.arcane_conductivity = 0.6
 	air.arcane_decay = 0.1
-	air.impulse_conductivity = 0.9
-	air.impulse_decay = 0.7
+	air.pressure_conductivity = 0.92
+	air.pressure_decay = 0.85
 	air.structure_value = 0.0
 	air.structure_recovery = 0.0
 	air.conduction_value = 0.6
