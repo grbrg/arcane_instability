@@ -12,7 +12,7 @@ config_version=5
 
 config/name="ArcaneInstability"
 config/version="0.1"
-run/main_scene="uid://bu1rx6eydcxns"
+run/main_scene="uid://dxpv8f0bhp7fc"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

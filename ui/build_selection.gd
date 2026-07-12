@@ -4,6 +4,7 @@ extends Control
 const CONFIG_PATH := "res://ui/modifier_availability.json"
 const SAVE_PATH := "user://build_selections.cfg"
 const EXPERIMENTAL_STATION_SCENE := "res://levels/experimental/experimental_station.tscn"
+const TITLE_MENU_SCENE := "res://ui/TitleMenu.tscn"
 
 const CAST_NAMES := ["Energy", "Conduction", "Impulse", "Structure"]
 const MODIFIER_TYPES := ["area", "distance", "energy_type", "extension"]
@@ -575,7 +576,7 @@ func _on_save_build(_player_idx: int) -> void:
 
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file(EXPERIMENTAL_STATION_SCENE)
+	get_tree().change_scene_to_file(TITLE_MENU_SCENE)
 
 
 func _on_start_pressed() -> void:
