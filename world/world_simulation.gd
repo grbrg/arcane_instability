@@ -55,6 +55,13 @@ func _reset_grid():
 			_add_neighbour(my_cell, Vector3i(cell_index.x, cell_index.y, cell_index.z + 1))
 			_add_neighbour(my_cell, Vector3i(cell_index.x, cell_index.y, cell_index.z - 1))
 
+		# populate every cell with an AirObject as the ambient medium
+		var air_script := preload("res://world/air_object.gd")
+		for cell_index in cell_indices:
+			var air_obj: WorldObject = air_script.new()
+			add_child(air_obj)
+			air_obj.global_position = grid.to_global(grid.map_to_local(cell_index))
+
 
 func _add_neighbour(cell: GridCell, neighbour: Vector3i) -> void:
 	if neighbour in _cells:

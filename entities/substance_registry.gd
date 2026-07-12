@@ -47,6 +47,25 @@ func _init() -> void:
 	_substances["kindling"] = kindling
 
 
+	var air = Substance.new()
+	air.thermal_capacity = 0.05
+	air.thermal_conductivity = 0.3
+	air.thermal_decay = 0.15
+	air.burning_temperature = FLOAT_MAX
+	air.electrical_capacity = 0.1
+	air.electrical_conductivity = 0.5
+	air.electrical_decay = 0.2
+	air.arcane_capacity = 0.3
+	air.arcane_conductivity = 0.6
+	air.arcane_decay = 0.1
+	air.impulse_conductivity = 0.9
+	air.impulse_decay = 0.7
+	air.structure_value = 0.0
+	air.structure_recovery = 0.0
+	air.conduction_value = 0.6
+	_substances["air"] = air
+
+
 ##
 func get_substance(type: String) -> Substance:
 	if type in _substances:

@@ -103,7 +103,7 @@ func diffuse_to_neighbours() -> void:
 					continue
 				var n_val: float = n_prop.get_value()
 				var amount: float = (val - n_val) * cond_val
-				if amount != 0:
+				if amount > 0:
 					var adj := StatAdjustment.new()
 					adj.source = str(current_cell.index)
 					adj.adjustment_type = "value"
