@@ -197,6 +197,34 @@ func get_grid_index(pos: Vector2) -> Vector3i:
 	return Vector3i.MIN
 
 
+# BFS outward from center, applying a directional impulse to every ring with
+# 50% decay per step. Stops once strength drops below 0.5.
+# Called immediately when a pressure cast lands so rings 2+ aren't delayed by ticks.
+func apply_pressure_wave(center: Vector3i, strength: float) -> void:
+	if not center in _cells:
+		return
+	var center_pos := Vector3(center.x, 0.0, center.z)
+	var visited := {center: true}
+	var frontier: Array[GridCell] = []
+	for n in _cells[center].neighbours:
+		visited[n.index] = true
+		frontier.append(n)
+	var ring_strength := strength
+	while ring_strength > 0.5 and not frontier.is_empty():
+		var next_frontier: Array[GridCell] = []
+		for cell in frontier:
+			var dir := (Vector3(cell.index.x, 0.0, cell.index.z) - center_pos).normalized()
+			cell.apply_impulse_to_objects(dir * ring_strength)
+			cell.update_impulse(dir * ring_strength)
+		for cell in frontier:
+			for n in cell.neighbours:
+				if not n.index in visited:
+					visited[n.index] = true
+					next_frontier.append(n)
+		ring_strength *= 0.5
+		frontier = next_frontier
+
+
 ##
 func _tick(delta: float) -> void:
 	for cast in _casts_to_resolve:

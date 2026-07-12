@@ -131,7 +131,7 @@ func apply_impulse_to_objects(impulse: Vector3) -> void:
 		if wo.moveable:
 			wo.receive_impulse(flat)
 	for character in characters:
-		character.apply_cell_impulse(flat * CHARACTER_IMPULSE_SCALE)
+		character.receive_impulse(flat * CHARACTER_IMPULSE_SCALE)
 
 
 # Called every frame: integrates object velocities and updates the indicator.
@@ -145,4 +145,7 @@ func apply_frame_movement(delta: float) -> void:
 	for wo in world_objects:
 		if wo.moveable:
 			wo.apply_velocity(delta)
+			wo.receive_impulse(flat)
 		wo.apply_impulse_visual(flat)
+	for character in characters:
+		character.receive_impulse(flat * CHARACTER_IMPULSE_SCALE)

@@ -92,7 +92,13 @@ func apply_impulse_visual(_impulse: Vector3) -> void:
 
 
 func receive_impulse(impulse: Vector3) -> void:
-	_velocity += impulse / maxf(mass, 0.1)
+	var effective := impulse / maxf(mass, 0.1)
+	if effective.length_squared() < 0.00001:
+		return
+	var dir := effective.normalized()
+	var current_component := _velocity.dot(dir)
+	if current_component < effective.length():
+		_velocity += dir * (effective.length() - current_component)
 
 
 func apply_velocity(delta: float) -> void:

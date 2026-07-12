@@ -9,6 +9,8 @@ var _process_mat: ParticleProcessMaterial
 
 func _ready() -> void:
 	_process_mat = ParticleProcessMaterial.new()
+	_process_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	_process_mat.emission_box_extents = Vector3(0.5, 0.125, 0.5)
 	_process_mat.direction = Vector3(0.0, 0.0, 1.0)
 	_process_mat.spread = 18.0
 	_process_mat.initial_velocity_min = 0.4
@@ -16,7 +18,7 @@ func _ready() -> void:
 	_process_mat.gravity = Vector3.ZERO
 	_process_mat.scale_min = 0.008
 	_process_mat.scale_max = 0.022
-	_process_mat.color = Color(0.75, 0.9, 1.0, 1.0)
+	_process_mat.color = Color(0.75, 0.9, 1.0, 0.15)
 
 	var mesh_mat := StandardMaterial3D.new()
 	mesh_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

@@ -12,6 +12,7 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 @export var pressure_tolerance: float = 0.5
 ## Multiplier applied to excess energy/impulse before dealing damage.
 @export var damage_scale: float = 20.0
+@export var mass: float = 1.0
 
 var health: HealthComp
 
@@ -71,8 +72,14 @@ func apply_stress_from_cell(cell: GridCell) -> void:
 	take_stress(energy_sum, pressure)
 
 
-func apply_cell_impulse(impulse: Vector3) -> void:
-	velocity += impulse
+func receive_impulse(impulse: Vector3) -> void:
+	var effective := impulse / maxf(mass, 0.1)
+	if effective.length_squared() < 0.00001:
+		return
+	var dir := effective.normalized()
+	var current_component := velocity.dot(dir)
+	if current_component < effective.length():
+		velocity += dir * (effective.length() - current_component)
 
 
 func apply_gravity(delta):

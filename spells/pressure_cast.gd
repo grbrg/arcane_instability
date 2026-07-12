@@ -5,7 +5,7 @@ extends Cast
 func _init() -> void:
 	axis = Cast.Axis.PRESSURE
 	speed = 6.0
-	strength = 20.0
+	strength = 5.0
 	distance_modifier = DistanceModifier.new()
 	distance_modifier.distance = DistanceModifier.Distance.MIDDLE
 
@@ -16,3 +16,4 @@ func apply_to_cell(world_simulation: WorldSimulation, cell: Vector3i, strength: 
 	adj.adjustment_type = "value"
 	adj.adjustment_value = strength
 	world_simulation.add_effect(cell, "pressure", adj)
+	world_simulation.apply_pressure_wave(cell, strength)
