@@ -23,6 +23,11 @@ var _character_cells: Dictionary = {}  # Character -> Vector3i
 var _world_objects: Array[WorldObject] = []
 var _world_object_cells: Dictionary = {}  # WorldObject -> Vector3i
 
+# Spell area preview highlights
+var _highlight_meshes: Dictionary = {}    # Vector3i -> MeshInstance3D
+var _player_highlights: Dictionary = {}   # Node -> Array[Vector3i]
+var _cell_highlighters: Dictionary = {}   # Vector3i -> Dictionary (Node -> Color)
+
 
 func _ready() -> void:
 	_ambient = Ambient.new()
@@ -223,6 +228,77 @@ func apply_pressure_wave(center: Vector3i, strength: float) -> void:
 					next_frontier.append(n)
 		ring_strength *= 0.5
 		frontier = next_frontier
+
+
+func set_player_highlights(player: Node, cells: Array[Vector3i], color: Color) -> void:
+	var valid: Array[Vector3i] = []
+	for idx in cells:
+		if idx in _cells:
+			valid.append(idx)
+
+	var old_cells: Array = _player_highlights.get(player, [])
+	_player_highlights[player] = valid
+
+	var affected: Dictionary = {}
+	for idx in old_cells:
+		if not idx in valid:
+			if idx in _cell_highlighters:
+				_cell_highlighters[idx].erase(player)
+			affected[idx] = true
+	for idx in valid:
+		if not idx in _cell_highlighters:
+			_cell_highlighters[idx] = {}
+		_cell_highlighters[idx][player] = color
+		affected[idx] = true
+	for idx in affected:
+		_update_cell_highlight(idx)
+
+
+func clear_player_highlights(player: Node) -> void:
+	if not player in _player_highlights:
+		return
+	var old_cells: Array = _player_highlights[player]
+	_player_highlights.erase(player)
+	for idx in old_cells:
+		if idx in _cell_highlighters:
+			_cell_highlighters[idx].erase(player)
+		_update_cell_highlight(idx)
+
+
+func _update_cell_highlight(idx: Vector3i) -> void:
+	var highlighters: Dictionary = _cell_highlighters.get(idx, {})
+	if highlighters.is_empty():
+		if idx in _highlight_meshes:
+			_highlight_meshes[idx].queue_free()
+			_highlight_meshes.erase(idx)
+		return
+
+	var r := 0.0
+	var g := 0.0
+	var b := 0.0
+	for c: Color in highlighters.values():
+		r += c.r
+		g += c.g
+		b += c.b
+	var count := float(highlighters.size())
+	var mixed := Color(r / count, g / count, b / count, 0.3)
+
+	if not idx in _highlight_meshes:
+		var mesh_inst := MeshInstance3D.new()
+		var plane_mesh := PlaneMesh.new()
+		plane_mesh.size = Vector2(1.0, 1.0)
+		mesh_inst.mesh = plane_mesh
+		var mat := StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mesh_inst.material_override = mat
+		add_child(mesh_inst)
+		var cell_pos := grid.to_global(grid.map_to_local(idx))
+		mesh_inst.global_position = cell_pos + Vector3(0.0, grid.cell_size.y * 0.5 + 0.01, 0.0)
+		_highlight_meshes[idx] = mesh_inst
+
+	(_highlight_meshes[idx].material_override as StandardMaterial3D).albedo_color = mixed
 
 
 ##

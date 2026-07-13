@@ -48,6 +48,8 @@ func _try_radiate() -> void:
 	_last_radiated_cell = current_cell
 	if _affected_cells.has(current_cell):
 		return
+	if current_cell == _cast.player_cell:
+		return
 	if _world_simulation.get_cell(current_cell) == null:
 		return
 	_affected_cells[current_cell] = true
@@ -65,7 +67,8 @@ func _arrive() -> void:
 		var grid := _world_simulation.grid
 		var cell := grid.local_to_map(grid.to_local(global_position))
 		cell.y = _cast.resolve_cell.y
-		_cast.apply_to_cell(_world_simulation, cell, _cast.strength)
+		if cell != _cast.player_cell:
+			_cast.apply_to_cell(_world_simulation, cell, _cast.strength)
 	else:
 		_cast.resolve(_world_simulation)
 		_spawn_bounce_shards()

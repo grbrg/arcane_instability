@@ -20,6 +20,9 @@ var casts: Array[Cast]:
 var _active_cast: Cast = null
 var _controller: PlayerController
 
+var _player_color: Color = Color.WHITE
+var _has_highlights: bool = false
+
 @onready var _cast_marker: SpellMarker = $SpellMarker
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 
@@ -51,6 +54,7 @@ func _assign_cast(slot: int, cast: Cast) -> void:
 
 
 func set_player_color(color: Color) -> void:
+	_player_color = color
 	if not mesh.material_override:
 		mesh.material_override = StandardMaterial3D.new()
 	mesh.material_override.albedo_color = color
@@ -110,6 +114,8 @@ func release_cast(slot: int) -> void:
 		var grid := world_sim.grid
 		var player_cell := grid.local_to_map(grid.to_local(global_position))
 
+		cast.player_cell = player_cell
+
 		if cast.distance_modifier != null \
 				and cast.distance_modifier.distance == DistanceModifier.Distance.AROUND_PLAYER \
 				and cast.area_modifier.target_area == AreaModifier.TargetArea.AREA:
@@ -150,11 +156,82 @@ func _physics_process(delta: float) -> void:
 
 func _process_casts(delta: float) -> void:
 	var facing := _controller.get_facing_dir()
+	if _active_cast != null and facing != Vector3.ZERO and not _active_cast._manual_dist:
+		_active_cast.redirect(facing)
 	for cast in _casts:
 		if cast != null:
 			cast.process(delta, global_position, facing)
 	if _active_cast != null and not _active_cast.is_active:
 		_active_cast = null
+
+	if _active_cast != null:
+		level.world_simulation.set_player_highlights(self, _get_cast_affected_cells(_active_cast), _player_color)
+		_has_highlights = true
+	elif _has_highlights:
+		level.world_simulation.clear_player_highlights(self)
+		_has_highlights = false
+
+
+func _get_cast_affected_cells(cast: Cast) -> Array[Vector3i]:
+	var cells: Array[Vector3i] = []
+	var world_sim := level.world_simulation
+	var grid := world_sim.grid
+
+	var is_around_player := cast.distance_modifier != null \
+		and cast.distance_modifier.distance == DistanceModifier.Distance.AROUND_PLAYER
+	var is_area := cast.area_modifier != null \
+		and cast.area_modifier.target_area == AreaModifier.TargetArea.AREA
+	var is_beam := cast.area_modifier != null \
+		and cast.area_modifier.target_area == AreaModifier.TargetArea.BEAM
+
+	var player_cell := grid.local_to_map(grid.to_local(global_position))
+
+	if is_around_player and is_area:
+		var center := world_sim.get_cell(player_cell)
+		if center != null:
+			for n in center.neighbours:
+				cells.append(n.index)
+		return cells
+
+	var target_pos: Vector3
+	if cast.show_marker:
+		target_pos = _cast_marker.global_position
+	else:
+		target_pos = global_position + cast._cast_dir * cast.max_dist
+
+	var target_cell := grid.local_to_map(grid.to_local(target_pos))
+
+	if is_beam:
+		var line: Array[Vector3i] = _get_cells_along_line(player_cell, target_cell)
+		if not line.is_empty() and line[0] == player_cell:
+			line.remove_at(0)
+		return line
+
+	if target_cell != player_cell:
+		cells.append(target_cell)
+	if is_area:
+		var cell := world_sim.get_cell(target_cell)
+		if cell != null:
+			for n in cell.neighbours:
+				if n.index != player_cell:
+					cells.append(n.index)
+	return cells
+
+
+func _get_cells_along_line(from: Vector3i, to: Vector3i) -> Array[Vector3i]:
+	var cells: Array[Vector3i] = []
+	var dx := to.x - from.x
+	var dz := to.z - from.z
+	var steps := maxi(absi(dx), absi(dz))
+	if steps == 0:
+		cells.append(from)
+		return cells
+	for i in range(steps + 1):
+		var t := float(i) / float(steps)
+		var idx := Vector3i(from.x + roundi(t * dx), from.y, from.z + roundi(t * dz))
+		if cells.is_empty() or cells[-1] != idx:
+			cells.append(idx)
+	return cells
 
 
 func _apply_build() -> void:

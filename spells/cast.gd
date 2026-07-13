@@ -60,6 +60,7 @@ var cooldown: float:
 		return max(0, total)
 
 var _resolve_cell: Vector3i
+var player_cell: Vector3i = Vector3i.MIN
 
 var resolve_cell: Vector3i:
 	get: return _resolve_cell
@@ -114,9 +115,11 @@ func apply_to_cell(_world_simulation: WorldSimulation, _cell: Vector3i, _strengt
 
 
 func resolve(world_simulation: WorldSimulation) -> void:
-	apply_to_cell(world_simulation, _resolve_cell, strength)
+	if _resolve_cell != player_cell:
+		apply_to_cell(world_simulation, _resolve_cell, strength)
 	if area_modifier != null and area_modifier.target_area == AreaModifier.TargetArea.AREA:
 		var cell := world_simulation.get_cell(_resolve_cell)
 		if cell != null:
 			for neighbour in cell.neighbours:
-				apply_to_cell(world_simulation, neighbour.index, strength)
+				if neighbour.index != player_cell:
+					apply_to_cell(world_simulation, neighbour.index, strength)
