@@ -20,7 +20,7 @@ const MODIFIER_VALUES := {
 	"area":        ["POINT", "PROJECTILE", "BEAM", "AREA"],
 	"distance":    ["AROUND_PLAYER", "SHORT", "MIDDLE", "FAR"],
 	"energy_type": ["THERMAL", "ELECTRICAL", "ARCANE"],
-	"extension":   ["BOUNCING", "PIERCING", "EXPLOSION"],
+	"extension":   ["BOUNCING", "INVERT", "EXPLOSION"],
 }
 
 const MODIFIER_DISPLAY := {
@@ -34,7 +34,7 @@ const MODIFIER_DISPLAY := {
 		"THERMAL": "Thermal", "ELECTRICAL": "Electric", "ARCANE": "Arcane",
 	},
 	"extension": {
-		"BOUNCING": "Bouncing", "PIERCING": "Piercing", "EXPLOSION": "Explode",
+		"BOUNCING": "Bouncing", "INVERT": "Invert", "EXPLOSION": "Explode",
 	},
 }
 

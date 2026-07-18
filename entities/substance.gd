@@ -5,22 +5,22 @@ extends Node
 @export_category("Thermal Energy")
 @export var thermal_capacity: float = 0.9
 @export var thermal_conductivity: float = 0.9
-@export var thermal_decay: float = 0.05
+@export var thermal_decay: float = 0.01
 @export var burning_temperature: float = 999999.9
 
 @export_category("Electrical Energy")
 @export var electrical_capacity: float = 0.5
 @export var electrical_conductivity: float = 0.5
-@export var electrical_decay: float = 0.1
+@export var electrical_decay: float = 0.01
 
 @export_category("Arcane Energy")
 @export var arcane_capacity: float = 0.5
 @export var arcane_conductivity: float = 0.5
-@export var arcane_decay: float = 0.1
+@export var arcane_decay: float = 0.01
 
 @export_category("Pressure")
 @export var pressure_conductivity: float = 0.5
-@export var pressure_decay: float = 0.85
+@export var pressure_decay: float = 0.01
 
 @export_category("Structure")
 @export var structure_value: float = 50.0

@@ -14,7 +14,7 @@ func _ready() -> void:
 
 ## Sets the temperature from 0 to 1 (very hot)
 func set_temperature(temp: float) -> void:
-	mesh.set_instance_shader_parameter("temperature", clampf(temp * _magnification, 0.0, 1.0))
+	mesh.set_instance_shader_parameter("temperature", clampf(temp * _magnification, -1.0, 1.0))
 
 
 func update(ambient: Ambient) -> void:

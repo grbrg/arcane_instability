@@ -55,7 +55,7 @@ func _try_radiate() -> void:
 	_affected_cells[current_cell] = true
 	var is_beam := _cast.area_modifier != null \
 		and _cast.area_modifier.target_area == AreaModifier.TargetArea.BEAM
-	var radiate_strength := _cast.strength if is_beam else 0.5
+	var radiate_strength := _cast.strength if is_beam else (_cast.strength / 2)
 	_cast.apply_to_cell(_world_simulation, current_cell, radiate_strength)
 	if is_beam:
 		_world_simulation.force_tick()

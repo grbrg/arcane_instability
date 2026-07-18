@@ -51,7 +51,7 @@ func add_adjustment(adjustment: StatAdjustment):
 	else:
 		# take the highest/lowest value
 		var existing = get_adjustment_from(adjustment.source) as StatAdjustment
-		if abs(existing.adjustment_value) < abs(adjustment.adjustment_value):
+		if abs(existing.adjustment_value) <= abs(adjustment.adjustment_value):
 			existing.adjustment_value = adjustment.adjustment_value
 	invalidate_cache()
 

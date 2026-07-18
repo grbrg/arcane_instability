@@ -269,6 +269,9 @@ func _apply_cast_modifiers(cast: Cast, mods: Dictionary) -> void:
 		if cast.extension_modifier == null:
 			cast.extension_modifier = ExtensionModifier.new()
 		cast.extension_modifier.extension = _extension_val(mods["extension"])
+		# invert always has negative effect
+		if cast.extension_modifier.extension == ExtensionModifier.Extension.INVERT:
+			cast.strength = -abs(cast.strength)
 
 
 static func _area_val(s: String) -> AreaModifier.TargetArea:
@@ -297,5 +300,6 @@ static func _energy_type_val(s: String) -> EnergyTypeModifier.Type:
 static func _extension_val(s: String) -> ExtensionModifier.Extension:
 	match s:
 		"BOUNCING":  return ExtensionModifier.Extension.BOUNCING
+		"INVERT":    return ExtensionModifier.Extension.INVERT
 		"EXPLOSION": return ExtensionModifier.Extension.EXPLOSION
-	return ExtensionModifier.Extension.PIERCING
+	return ExtensionModifier.Extension.NONE
