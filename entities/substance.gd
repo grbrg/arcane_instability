@@ -15,12 +15,12 @@ extends Node
 
 @export_category("Arcane Energy")
 @export var arcane_capacity: float = 0.5
-@export var arcane_conductivity: float = 0.5
+@export var arcane_conductivity: float = 0.9
 @export var arcane_decay: float = 0.01
 
 @export_category("Pressure")
 @export var pressure_conductivity: float = 0.5
-@export var pressure_decay: float = 0.1
+@export var pressure_decay: float = 0.5
 
 @export_category("Structure")
 @export var structure_value: float = 50.0

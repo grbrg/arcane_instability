@@ -2,9 +2,10 @@ class_name GridCell
 extends Node
 
 # Fraction of the cell impulse vector applied to a character's velocity per tick.
-const CHARACTER_IMPULSE_SCALE := 0.5
+const CHARACTER_IMPULSE_SCALE := 0.25
 # Fraction of the stored impulse that decays per second (for the indicator / visual).
-const IMPULSE_DECAY := 0.75
+# 0.9375 = retention squared vs. the old 0.75, i.e. same decay curve in half the time.
+const IMPULSE_DECAY := 0.99
 
 var grid: GridMap
 var index: Vector3i

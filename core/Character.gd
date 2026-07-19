@@ -9,7 +9,7 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 ## Total energy (across all channels) a character can withstand before taking damage.
 @export var energy_tolerance: float = 0.5
 ## Pressure a character can withstand before taking damage.
-@export var pressure_tolerance: float = 4.0
+@export var pressure_tolerance: float = 2.0
 ## Multiplier applied to excess energy/impulse before dealing damage.
 @export var damage_scale: float = 20.0
 @export var mass: float = 1.0

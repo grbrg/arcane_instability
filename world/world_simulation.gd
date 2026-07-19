@@ -308,12 +308,12 @@ func _tick(delta: float) -> void:
 	_casts_to_resolve.clear()
 
 	# Impulse is measured before decay/diffuse so the cast gradient is at full strength.
-	# Velocity kicks are applied once here; per-frame integration happens in _process.
+	# Only the stored (decaying) impulse drives velocity kicks, in _process, so a
+	# lingering gradient fades exponentially instead of re-kicking at full strength each tick.
 	for index in _cells:
 		var cell: GridCell = _cells[index]
 		var impulse := cell.compute_impulse()
 		cell.update_impulse(impulse)
-		cell.apply_impulse_to_objects(impulse)
 
 	for index in _cells:
 		var cell = _cells[index]
@@ -324,3 +324,5 @@ func _tick(delta: float) -> void:
 
 	for index in _cells:
 		_cells[index].diffuse()
+		_cells[index].diffuse_pressure()
+
