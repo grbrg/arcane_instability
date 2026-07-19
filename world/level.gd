@@ -29,7 +29,7 @@ func _ready() -> void:
 func _on_player_spawned(player: Player) -> void:
 	if not player in players:
 		players.append(player)
-		camera.follow_targets.append(player)
+		camera.add_follow_target(player)
 		world_simulation.register_character(player)
 
 

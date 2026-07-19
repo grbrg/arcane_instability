@@ -14,18 +14,36 @@ const _follow_target_offset: Vector3 = Vector3(0, 20, -10)
 
 var _velocity: Vector3
 
+# last known position of a player removed from follow_targets (e.g. on death),
+# keyed by device_id, so the viewport doesn't jump when they're removed
+var _last_known_positions: Dictionary = {}
 
+
+func remove_follow_target(player: Player) -> void:
+	follow_targets.erase(player)
+	_last_known_positions[player.device_id] = player.global_position
+
+
+func add_follow_target(player: Player) -> void:
+	follow_targets.append(player)
+	_last_known_positions.erase(player.device_id)
 
 
 ##
 #
 ##
 func _process(delta):
-	if len(follow_targets) > 0:
+	var anchors: Array[Vector3] = []
+	for target in follow_targets:
+		anchors.append(target.global_position)
+	for pos in _last_known_positions.values():
+		anchors.append(pos)
+
+	if len(anchors) > 0:
 		var centroid = Vector3.ZERO
-		for target in follow_targets:
-			centroid += target.global_position
-		centroid /= len(follow_targets)
+		for pos in anchors:
+			centroid += pos
+		centroid /= len(anchors)
 
 		# Step backward along the camera's forward ray so centroid lands at
 		# the center of the viewport, keeping the camera _follow_target_offset.y

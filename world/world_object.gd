@@ -43,9 +43,6 @@ func add_effect(type: String, adj: StatAdjustment) -> void:
 		if type == "thermal":
 			var view = ResourceManager.thermal_view_scene.instantiate() as TemperatureView
 			_create_property_view(type, view, prop)
-		elif type == "pressure" and substance_name != "air":
-			var view = ResourceManager.pressure_view_scene.instantiate() as PressureView
-			_create_property_view(type, view, prop)
 
 
 func _create_property_view(type: String, view: EntityPropertyView, prop: EntityProperty) -> void:

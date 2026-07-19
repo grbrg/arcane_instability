@@ -48,7 +48,7 @@ func _spawn_player(device_id: int) -> void:
 		if level:
 			level.players.append(player)
 			if level.camera:
-				level.camera.follow_targets.append(player)
+				level.camera.add_follow_target(player)
 		player.health.died.connect(func(): _on_player_died(player, device_id))
 	)
 	get_parent().add_child(player)
@@ -65,6 +65,6 @@ func _on_player_died(player: Player, device_id: int) -> void:
 	if level:
 		level.players.erase(player)
 		if level.camera:
-			level.camera.follow_targets.erase(player)
+			level.camera.remove_follow_target(player)
 	player.queue_free()
 	get_tree().create_timer(respawn_delay).timeout.connect(func(): _spawn_player(device_id))

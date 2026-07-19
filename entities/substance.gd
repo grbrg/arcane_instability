@@ -20,7 +20,7 @@ extends Node
 
 @export_category("Pressure")
 @export var pressure_conductivity: float = 0.5
-@export var pressure_decay: float = 0.01
+@export var pressure_decay: float = 0.1
 
 @export_category("Structure")
 @export var structure_value: float = 50.0

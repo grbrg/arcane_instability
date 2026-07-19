@@ -33,7 +33,7 @@ func _ready() -> void:
 	_particles = GPUParticles3D.new()
 	_particles.process_material = _process_mat
 	_particles.draw_pass_1 = quad
-	_particles.amount = 180
+	_particles.amount = 45
 	_particles.lifetime = 0.8
 	_particles.emitting = false
 	add_child(_particles)
