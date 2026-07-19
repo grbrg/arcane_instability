@@ -28,7 +28,7 @@ polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
 [node name="ExperimentalStation" type="Node3D" unique_id=2072741116 node_paths=PackedStringArray("player_spawner", "enemy_spawner", "grid", "world_simulation", "camera")]
 script = ExtResource("1_bp11k")
 player_spawner = NodePath("PlayerSpawner")
-enemy_spawner = NodePath("EnemySpawner")
+enemy_spawner = NodePath("EnemySpawner1")
 grid = NodePath("NavigationRegion3D/GridMap")
 world_simulation = NodePath("WorldSimulation")
 camera = NodePath("IsometricCamera3D")
@@ -68,19 +68,19 @@ camera = NodePath("../IsometricCamera3D")
 [node name="Walls" type="Node3D" parent="." unique_id=1779188957]
 
 [node name="CSGBox3D" type="CSGBox3D" parent="Walls" unique_id=749516836]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.986908, 0.5, -19.336426)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.986908, 0.5, -12.336426)
 use_collision = true
 collision_mask = 7
 size = Vector3(30, 1, 1)
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="Walls" unique_id=606574553]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0788574, 0.5, 20.277344)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0788574, 0.5, 13.277344)
 use_collision = true
 collision_mask = 7
 size = Vector3(30, 1, 1)
 
 [node name="CSGBox3D3" type="CSGBox3D" parent="Walls" unique_id=1703014368]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -21.344704, 0.5, 0.22131348)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -13.344704, 0.5, 0.22131348)
 use_collision = true
 collision_mask = 7
 size = Vector3(40, 1, 1)
@@ -103,8 +103,14 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, 1, 0)
 
-[node name="EnemySpawner" type="Node3D" parent="." unique_id=1321051001]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.080322, 1.0748291, 0)
+[node name="EnemySpawner1" type="Node3D" parent="." unique_id=1321051001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.080322, 1.0748291, -8)
+script = ExtResource("8_w75ax")
+enemy_scene = ExtResource("7_clr4a")
+metadata/_custom_type_script = "uid://cx5adsj5gp61u"
+
+[node name="EnemySpawner2" type="Node3D" parent="." unique_id=1981984111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.080322, 1.0748291, 8)
 script = ExtResource("8_w75ax")
 enemy_scene = ExtResource("7_clr4a")
 metadata/_custom_type_script = "uid://cx5adsj5gp61u"
