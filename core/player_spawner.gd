@@ -24,8 +24,22 @@ func _ready() -> void:
 
 
 func spawn_all_players() -> void:
-	for i in number_of_players:
-		_spawn_player(i)
+	for device_id in _connected_device_ids():
+		_spawn_player(device_id)
+
+
+func _connected_device_ids() -> Array:
+	# Registry entries are set by the build selection screen; a non-null entry
+	# means a controller occupied that slot. Fall back to number_of_players
+	# when the registry is empty (e.g. running a level directly).
+	var ids: Array = []
+	for i in _Registry.builds.size():
+		if _Registry.builds[i] != null:
+			ids.append(i)
+	if ids.is_empty():
+		for i in number_of_players:
+			ids.append(i)
+	return ids
 
 
 func _spawn_player(device_id: int) -> void:
@@ -36,7 +50,7 @@ func _spawn_player(device_id: int) -> void:
 	player.level = level
 	player.ready.connect(func():
 		var color: Color
-		if device_id < _Registry.builds.size():
+		if device_id < _Registry.builds.size() and _Registry.builds[device_id] != null:
 			color = _Registry.builds[device_id].get("color", Color.WHITE)
 		elif device_id < player_colors.size():
 			color = player_colors[device_id]

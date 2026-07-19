@@ -84,6 +84,7 @@ var _back_btn: Button = null
 var _start_btn: Button = null
 var _navs: Array = []         # per-player nav state dicts
 var _joy_cooldown: Array = [] # per-player axis cooldown (seconds)
+var _connected: Array = []    # per-player bool, true if a controller occupies that slot
 
 
 func _ready() -> void:
@@ -91,8 +92,15 @@ func _ready() -> void:
 	_init_player_data()
 	_load_saved()
 	_build_ui()
+	_update_connections()
+	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	await get_tree().process_frame
 	_setup_navigation()
+
+
+func _exit_tree() -> void:
+	if Input.joy_connection_changed.is_connected(_on_joy_connection_changed):
+		Input.joy_connection_changed.disconnect(_on_joy_connection_changed)
 
 
 func _load_config() -> void:
@@ -250,6 +258,7 @@ func _add_bottom_bar(parent: Control) -> void:
 	_start_btn = Button.new()
 	_start_btn.text = "Start"
 	_start_btn.custom_minimum_size = Vector2(140, 44)
+	_start_btn.disabled = true
 	_start_btn.pressed.connect(_on_start_pressed)
 	hbox.add_child(_start_btn)
 
@@ -366,6 +375,31 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 	save_btn.pressed.connect(_on_save_build.bind(player_idx))
 	btn_row.add_child(save_btn)
 	ui["save_btn"] = save_btn
+
+	# --- "Press any button" placeholder overlay ---
+	var overlay := Control.new()
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	card_panel.add_child(overlay)
+
+	var overlay_bg := ColorRect.new()
+	overlay_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay_bg.color = Color(0.0, 0.0, 0.0, 0.75)
+	overlay_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(overlay_bg)
+
+	var placeholder_label := Label.new()
+	placeholder_label.text = "Press any button"
+	placeholder_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	placeholder_label.offset_top = 24
+	placeholder_label.offset_bottom = 56
+	placeholder_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	placeholder_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	placeholder_label.add_theme_font_size_override("font_size", 18)
+	placeholder_label.add_theme_color_override("font_color", C_TEXT)
+	placeholder_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(placeholder_label)
+
+	ui["placeholder_overlay"] = overlay
 
 	_player_ui.append(ui)
 
@@ -587,11 +621,51 @@ func _on_start_pressed() -> void:
 func _write_to_registry() -> void:
 	_Registry.builds.clear()
 	for i in NUM_PLAYERS:
+		if not _connected[i]:
+			_Registry.builds.append(null)
+			continue
 		_Registry.builds.append({
 			"name": _player_data[i]["name"],
 			"color": PLAYER_COLORS[_player_data[i]["color_index"]],
 			"casts": (_player_data[i]["casts"] as Dictionary).duplicate(true),
 		})
+
+
+# ---------------------------------------------------------------------------
+# Controller connection / placeholders
+# ---------------------------------------------------------------------------
+
+func _update_connections() -> void:
+	_connected.resize(NUM_PLAYERS)
+	for i in NUM_PLAYERS:
+		_connected[i] = false
+	for dev in Input.get_connected_joypads():
+		if dev >= 0 and dev < NUM_PLAYERS:
+			_connected[dev] = true
+	for i in NUM_PLAYERS:
+		_update_placeholder(i)
+	_update_start_button()
+
+
+func _on_joy_connection_changed(device: int, connected: bool) -> void:
+	if device < 0 or device >= NUM_PLAYERS:
+		return
+	_connected[device] = connected
+	_update_placeholder(device)
+	_update_start_button()
+
+
+func _update_placeholder(player_idx: int) -> void:
+	if player_idx >= _player_ui.size():
+		return
+	var ui: Dictionary = _player_ui[player_idx]
+	(ui["placeholder_overlay"] as Control).visible = not _connected[player_idx]
+
+
+func _update_start_button() -> void:
+	if _start_btn == null:
+		return
+	_start_btn.disabled = not _connected.has(true)
 
 
 # ---------------------------------------------------------------------------

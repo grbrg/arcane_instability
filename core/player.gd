@@ -235,7 +235,7 @@ func _get_cells_along_line(from: Vector3i, to: Vector3i) -> Array[Vector3i]:
 
 
 func _apply_build() -> void:
-	if device_id < 0 or device_id >= _Registry.builds.size():
+	if device_id < 0 or device_id >= _Registry.builds.size() or _Registry.builds[device_id] == null:
 		return
 	var build: Dictionary = _Registry.builds[device_id]
 	var cast_mods: Dictionary = build.get("casts", {})
