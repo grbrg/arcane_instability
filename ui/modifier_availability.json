@@ -20,6 +20,7 @@
       "ARCANE": true
     },
     "extension": {
+      "NONE": true,
       "BOUNCING": true,
       "INVERT": true,
       "EXPLOSION": true

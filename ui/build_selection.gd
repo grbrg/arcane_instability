@@ -20,7 +20,7 @@ const MODIFIER_VALUES := {
 	"area":        ["POINT", "PROJECTILE", "BEAM", "AREA"],
 	"distance":    ["AROUND_PLAYER", "SHORT", "MIDDLE", "FAR"],
 	"energy_type": ["THERMAL", "ELECTRICAL", "ARCANE"],
-	"extension":   ["BOUNCING", "INVERT", "EXPLOSION"],
+	"extension":   ["NONE", "BOUNCING", "INVERT", "EXPLOSION"],
 }
 
 const MODIFIER_DISPLAY := {
@@ -34,7 +34,7 @@ const MODIFIER_DISPLAY := {
 		"THERMAL": "Thermal", "ELECTRICAL": "Electric", "ARCANE": "Arcane",
 	},
 	"extension": {
-		"BOUNCING": "Bouncing", "INVERT": "Invert", "EXPLOSION": "Explode",
+		"NONE": "None", "BOUNCING": "Bouncing", "INVERT": "Invert", "EXPLOSION": "Explode",
 	},
 }
 
@@ -143,7 +143,7 @@ func _init_player_data() -> void:
 				"area": "POINT",
 				"distance": "SHORT",
 				"energy_type": "THERMAL",
-				"extension": "PIERCING",
+				"extension": "NONE",
 			}
 		_player_data.append({
 			"name": "Player %d" % (i + 1),
