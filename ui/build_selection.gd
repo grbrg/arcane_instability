@@ -6,7 +6,14 @@ const SAVE_PATH := "user://build_selections.cfg"
 const EXPERIMENTAL_STATION_SCENE := "res://levels/experimental/experimental_station.tscn"
 const TITLE_MENU_SCENE := "res://ui/TitleMenu.tscn"
 
-const CAST_NAMES := ["Energy", "Conduction", "Pressure", "Structure"]
+const BUTTON_LABELS := ["R2", "R1", "L2", "L1"]
+const NUM_BUTTONS := 4
+
+const AXIS_VALUES := ["ENERGY", "PRESSURE", "STRUCTURE", "CONDUCTION"]
+const AXIS_DISPLAY := {
+	"ENERGY": "Energy", "PRESSURE": "Pressure", "STRUCTURE": "Structure", "CONDUCTION": "Conduction",
+}
+
 const MODIFIER_TYPES := ["area", "distance", "energy_type", "extension"]
 
 const MODIFIER_LABELS := {
@@ -137,18 +144,19 @@ func _use_default_availability() -> void:
 func _init_player_data() -> void:
 	_player_data.clear()
 	for i in NUM_PLAYERS:
-		var casts: Dictionary = {}
-		for cast in CAST_NAMES:
-			casts[cast] = {
+		var buttons: Array = []
+		for slot in NUM_BUTTONS:
+			buttons.append({
+				"axis": AXIS_VALUES[slot],
 				"area": "POINT",
 				"distance": "SHORT",
 				"energy_type": "THERMAL",
 				"extension": "NONE",
-			}
+			})
 		_player_data.append({
 			"name": "Player %d" % (i + 1),
 			"color_index": i % PLAYER_COLORS.size(),
-			"casts": casts,
+			"buttons": buttons,
 		})
 
 
@@ -163,12 +171,15 @@ func _load_saved() -> void:
 		_player_data[i]["name"] = cfg.get_value(section, "name", _player_data[i]["name"])
 		var saved_color: int = cfg.get_value(section, "color_index", _player_data[i]["color_index"])
 		_player_data[i]["color_index"] = clampi(saved_color, 0, PLAYER_COLORS.size() - 1)
-		for cast in CAST_NAMES:
+		for slot in NUM_BUTTONS:
+			var saved_axis: String = cfg.get_value(section, "button%d_axis" % slot, "")
+			if saved_axis in AXIS_VALUES:
+				_player_data[i]["buttons"][slot]["axis"] = saved_axis
 			for mod in MODIFIER_TYPES:
-				var key := "%s_%s" % [cast.to_lower(), mod]
+				var key := "button%d_%s" % [slot, mod]
 				var saved: String = cfg.get_value(section, key, "")
 				if saved in MODIFIER_VALUES[mod]:
-					_player_data[i]["casts"][cast][mod] = saved
+					_player_data[i]["buttons"][slot][mod] = saved
 
 
 func _save() -> void:
@@ -177,9 +188,10 @@ func _save() -> void:
 		var section := "player%d" % i
 		cfg.set_value(section, "name", _player_data[i]["name"])
 		cfg.set_value(section, "color_index", _player_data[i]["color_index"])
-		for cast in CAST_NAMES:
+		for slot in NUM_BUTTONS:
+			cfg.set_value(section, "button%d_axis" % slot, _player_data[i]["buttons"][slot]["axis"])
 			for mod in MODIFIER_TYPES:
-				cfg.set_value(section, "%s_%s" % [cast.to_lower(), mod], _player_data[i]["casts"][cast][mod])
+				cfg.set_value(section, "button%d_%s" % [slot, mod], _player_data[i]["buttons"][slot][mod])
 	cfg.save(SAVE_PATH)
 
 
@@ -350,10 +362,11 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 
 	vbox.add_child(_make_h_separator())
 
-	# --- Cast sections ---
-	for cast in CAST_NAMES:
-		ui["options"][cast] = {}
-		_create_cast_section(player_idx, cast, vbox, ui)
+	# --- Button sections ---
+	ui["axis_buttons"] = []
+	for slot in NUM_BUTTONS:
+		ui["options"][slot] = {}
+		_create_button_section(player_idx, slot, vbox, ui)
 
 	# --- Load / Save buttons ---
 	var btn_row := HBoxContainer.new()
@@ -403,11 +416,11 @@ func _create_player_card(player_idx: int, parent: Control) -> void:
 
 	_player_ui.append(ui)
 
-	for cast in CAST_NAMES:
-		_validate_cast(player_idx, cast)
+	for slot in NUM_BUTTONS:
+		_validate_button(player_idx, slot)
 
 
-func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContainer, ui: Dictionary) -> void:
+func _create_button_section(player_idx: int, slot: int, parent: VBoxContainer, ui: Dictionary) -> void:
 	var section_panel := PanelContainer.new()
 	var section_style := StyleBoxFlat.new()
 	section_style.bg_color = C_SECTION_BG
@@ -422,22 +435,22 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 	section_vbox.add_theme_constant_override("separation", 4)
 	section_panel.add_child(section_vbox)
 
-	# Header: cast name + warning indicator
+	# Header: button label + warning indicator
 	var header_hbox := HBoxContainer.new()
 	section_vbox.add_child(header_hbox)
 
-	var cast_label := Label.new()
-	cast_label.text = cast_name
-	cast_label.add_theme_font_size_override("font_size", 15)
-	cast_label.add_theme_color_override("font_color", C_TITLE)
-	cast_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header_hbox.add_child(cast_label)
+	var button_label := Label.new()
+	button_label.text = BUTTON_LABELS[slot]
+	button_label.add_theme_font_size_override("font_size", 15)
+	button_label.add_theme_color_override("font_color", C_TITLE)
+	button_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_hbox.add_child(button_label)
 
 	var cooldown_label := Label.new()
 	cooldown_label.add_theme_font_size_override("font_size", 13)
 	cooldown_label.add_theme_color_override("font_color", C_TEXT_DIM)
 	header_hbox.add_child(cooldown_label)
-	ui["cooldown_labels"][cast_name] = cooldown_label
+	ui["cooldown_labels"][slot] = cooldown_label
 
 	var warn_label := Label.new()
 	warn_label.text = "Invalid combo"
@@ -445,7 +458,21 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 	warn_label.add_theme_color_override("font_color", C_WARNING)
 	warn_label.visible = false
 	header_hbox.add_child(warn_label)
-	ui["warnings"][cast_name] = warn_label
+	ui["warnings"][slot] = warn_label
+
+	# Axis picker — which state axis this button manipulates
+	var axis_opt := OptionButton.new()
+	axis_opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	axis_opt.custom_minimum_size.y = 28
+	axis_opt.clip_text = true
+	axis_opt.add_theme_font_size_override("font_size", 13)
+	var current_axis: String = _player_data[player_idx]["buttons"][slot]["axis"]
+	for axis_val in AXIS_VALUES:
+		axis_opt.add_item(AXIS_DISPLAY.get(axis_val, axis_val))
+	axis_opt.selected = maxi(0, AXIS_VALUES.find(current_axis))
+	axis_opt.item_selected.connect(_on_axis_changed.bind(player_idx, slot))
+	section_vbox.add_child(axis_opt)
+	ui["axis_buttons"].append(axis_opt)
 
 	# 2x2 modifier grid
 	var mod_grid := GridContainer.new()
@@ -473,7 +500,7 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 		opt.add_theme_font_size_override("font_size", 13)
 
 		var item_values: Array = []
-		var current_val: String = _player_data[player_idx]["casts"][cast_name][mod_type]
+		var current_val: String = _player_data[player_idx]["buttons"][slot][mod_type]
 		var current_idx := 0
 
 		for val in MODIFIER_VALUES[mod_type]:
@@ -491,10 +518,10 @@ func _create_cast_section(player_idx: int, cast_name: String, parent: VBoxContai
 			opt.set_item_disabled(current_idx, true)
 
 		opt.selected = current_idx
-		opt.item_selected.connect(_on_modifier_changed.bind(player_idx, cast_name, mod_type, item_values))
+		opt.item_selected.connect(_on_modifier_changed.bind(player_idx, slot, mod_type, item_values))
 		cell.add_child(opt)
 
-		ui["options"][cast_name][mod_type] = {"btn": opt, "values": item_values}
+		ui["options"][slot][mod_type] = {"btn": opt, "values": item_values}
 
 
 func _style_color_button(btn: Button, color_idx: int, selected: bool) -> void:
@@ -540,25 +567,33 @@ func _on_color_selected(color_idx: int, player_idx: int) -> void:
 	(ui["name_edit"] as LineEdit).add_theme_color_override("font_color", new_color)
 
 
-func _on_modifier_changed(item_idx: int, player_idx: int, cast_name: String, mod_type: String, item_values: Array) -> void:
+func _on_axis_changed(item_idx: int, player_idx: int, slot: int) -> void:
+	if item_idx < 0 or item_idx >= AXIS_VALUES.size():
+		return
+	_player_data[player_idx]["buttons"][slot]["axis"] = AXIS_VALUES[item_idx]
+	_save()
+	_validate_button(player_idx, slot)
+
+
+func _on_modifier_changed(item_idx: int, player_idx: int, slot: int, mod_type: String, item_values: Array) -> void:
 	if item_idx < 0 or item_idx >= item_values.size():
 		return
-	_player_data[player_idx]["casts"][cast_name][mod_type] = item_values[item_idx]
+	_player_data[player_idx]["buttons"][slot][mod_type] = item_values[item_idx]
 	_save()
-	_validate_cast(player_idx, cast_name)
+	_validate_button(player_idx, slot)
 
 
-func _validate_cast(player_idx: int, cast_name: String) -> void:
-	var selection: Dictionary = _player_data[player_idx]["casts"][cast_name]
+func _validate_button(player_idx: int, slot: int) -> void:
+	var selection: Dictionary = _player_data[player_idx]["buttons"][slot]
 	var disallowed: Dictionary = _Validator.get_disallowed(selection, _invalid_rules)
 	var valid: bool = _Validator.is_valid(selection, _invalid_rules)
 
 	var ui: Dictionary = _player_ui[player_idx]
-	(ui["warnings"][cast_name] as Label).visible = not valid
-	(ui["cooldown_labels"][cast_name] as Label).text = "%.1fs" % _calc_cast_cooldown(cast_name, selection)
+	(ui["warnings"][slot] as Label).visible = not valid
+	(ui["cooldown_labels"][slot] as Label).text = "%.1fs" % _calc_cast_cooldown(selection["axis"], selection)
 
 	for mod_type in MODIFIER_TYPES:
-		var info: Dictionary = ui["options"][cast_name][mod_type]
+		var info: Dictionary = ui["options"][slot][mod_type]
 		var opt := info["btn"] as OptionButton
 		var values: Array = info["values"]
 		var bad: Array = disallowed.get(mod_type, [])
@@ -566,14 +601,8 @@ func _validate_cast(player_idx: int, cast_name: String) -> void:
 			opt.set_item_disabled(i, values[i] in bad)
 
 
-func _calc_cast_cooldown(cast_name: String, mods: Dictionary) -> float:
-	var cast: Cast
-	match cast_name:
-		"Energy":     cast = EnergyCast.new()
-		"Conduction": cast = ConductionCast.new()
-		"Pressure":   cast = PressureCast.new()
-		"Structure":  cast = StructureCast.new()
-		_: return 0.0
+func _calc_cast_cooldown(axis: String, mods: Dictionary) -> float:
+	var cast: Cast = Cast.create_from_name(axis)
 	for mod_type in MODIFIER_TYPES:
 		var val: String = mods.get(mod_type, "")
 		var idx: int = MODIFIER_VALUES[mod_type].find(val)
@@ -627,7 +656,7 @@ func _write_to_registry() -> void:
 		_Registry.builds.append({
 			"name": _player_data[i]["name"],
 			"color": PLAYER_COLORS[_player_data[i]["color_index"]],
-			"casts": (_player_data[i]["casts"] as Dictionary).duplicate(true),
+			"buttons": (_player_data[i]["buttons"] as Array).duplicate(true),
 		})
 
 
@@ -689,8 +718,9 @@ func _setup_navigation() -> void:
 		rows.append([ui["name_edit"]])
 		rows.append(cbtns.slice(0, 8))
 		rows.append(cbtns.slice(8, 16))
-		for cast_name in CAST_NAMES:
-			var opts: Dictionary = ui["options"][cast_name]
+		for slot in NUM_BUTTONS:
+			rows.append([ui["axis_buttons"][slot]])
+			var opts: Dictionary = ui["options"][slot]
 			rows.append([opts["area"]["btn"],        opts["distance"]["btn"]])
 			rows.append([opts["energy_type"]["btn"], opts["extension"]["btn"]])
 		rows.append([ui["load_btn"], ui["save_btn"]])

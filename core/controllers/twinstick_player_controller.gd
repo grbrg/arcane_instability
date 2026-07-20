@@ -41,17 +41,17 @@ func _update_cast_inputs(device_id: int) -> void:
 	var l1 := Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_SHOULDER)
 
 	if r2 != _r2_pressed:
-		if r2: _player.request_cast(Player.SLOT_ENERGY)
-		else:  _player.release_cast(Player.SLOT_ENERGY)
+		if r2: _player.request_cast(Player.BUTTON_R2)
+		else:  _player.release_cast(Player.BUTTON_R2)
 	if r1 != _r1_pressed:
-		if r1: _player.request_cast(Player.SLOT_PRESSURE)
-		else:  _player.release_cast(Player.SLOT_PRESSURE)
+		if r1: _player.request_cast(Player.BUTTON_R1)
+		else:  _player.release_cast(Player.BUTTON_R1)
 	if l2 != _l2_pressed:
-		if l2: _player.request_cast(Player.SLOT_STRUCTURE)
-		else:  _player.release_cast(Player.SLOT_STRUCTURE)
+		if l2: _player.request_cast(Player.BUTTON_L2)
+		else:  _player.release_cast(Player.BUTTON_L2)
 	if l1 != _l1_pressed:
-		if l1: _player.request_cast(Player.SLOT_CONDUCTION)
-		else:  _player.release_cast(Player.SLOT_CONDUCTION)
+		if l1: _player.request_cast(Player.BUTTON_L1)
+		else:  _player.release_cast(Player.BUTTON_L1)
 
 	_r2_pressed = r2
 	_r1_pressed = r1

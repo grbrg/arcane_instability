@@ -13,9 +13,9 @@
 
 **Spell/module system — original design is dead code, actually implemented differently:**
 - `modules/module.gd`, `energy_channel_module.gd`, `form_module.gd`, `modifier_module.gd` exist with enums matching the doc's "Energiekanal / Form / Modifikator" vocabulary, but are **never instantiated anywhere** — only referenced as unused typed vars in `spells/cast.gd`. Treat this whole folder as legacy/dead.
-- What's actually live: `spells/cast.gd` defines `Cast.Axis = {ENERGY, PRESSURE, STRUCTURE, CONDUCTION}`, with one fixed subclass per axis (`energy_cast.gd`, `pressure_cast.gd`, `structure_cast.gd`, `conduction_cast.gd`; `impulse_cast.gd` is a dead stub). `core/player.gd` hardcodes these permanently to R2/R1/L2/L1 (`SLOT_ENERGY/PRESSURE/STRUCTURE/CONDUCTION`) — **the four shoulder buttons are not player-reassignable axes**, only the modifiers on each fixed axis are customizable.
+- What's actually live: `spells/cast.gd` defines `Cast.Axis = {ENERGY, PRESSURE, STRUCTURE, CONDUCTION}`, with one subclass per axis (`energy_cast.gd`, `pressure_cast.gd`, `structure_cast.gd`, `conduction_cast.gd`; `impulse_cast.gd` is a dead stub) plus a static `Cast.create(axis)` / `Cast.create_from_name(str)` factory. `core/player.gd` exposes 4 physical button slots (`BUTTON_R2/R1/L2/L1`, values 0-3) — **which axis fires on each button is chosen per-player in Build Selection** (`_resolve_axes()`/`_apply_build()`), not hardcoded. Assignment is free (an axis may be repeated across buttons or omitted entirely), defaulting to the historical R2=ENERGY/R1=PRESSURE/L2=STRUCTURE/L1=CONDUCTION order when no build data exists.
 - Each `Cast` carries four modifier slots: `AreaModifier` (POINT/PROJECTILE/BEAM/AREA — the actual "form" concept, not Strahl/Aura/Mine/Kegel), `DistanceModifier` (range/cooldown), `EnergyTypeModifier` (THERMAL/ELECTRICAL/ARCANE, energy-axis only), `ExtensionModifier` (NONE/BOUNCING/INVERT/EXPLOSION — `INVERT` has no doc equivalent; doc's "Größer/Schneller/Durchdringt" have no direct equivalent).
-- Pre-run loadout customization happens in a full **Build Selection UI** (`ui/build_selection.gd`, `core/build_registry.gd`, persisted to `user://build_selections.cfg`), validated by a small data-driven rule engine `spells/modifiers/modifier_validator.gd` against `ui/modifier_availability.json`. None of this existed when the original doc was written.
+- Pre-run loadout customization happens in a full **Build Selection UI** (`ui/build_selection.gd`, `core/build_registry.gd`, persisted to `user://build_selections.cfg`), where each of the 4 button slots gets both an axis dropdown and its 4 modifier dropdowns, validated by a small data-driven rule engine `spells/modifiers/modifier_validator.gd` against `ui/modifier_availability.json`. None of this existed when the original doc was written.
 
 **World architecture:**
 - `WorldObject` (`world/world_object.gd`) is the real anchoring abstraction — binds an `Entity` + `Substance` to a grid position, owns diffusion, energy-stress damage, and friction/traction physics. The doc talks about "cells" and "entities" but never mentions this class.
@@ -89,9 +89,11 @@ Die Steuerung erfolgt per Controller:
 
 * Linker Stick → Bewegung
 * Rechter Stick → Cursor/Zielrichtung
-* Vier Schultertasten (R2/R1/L2/L1) feuern je einen **festen** Achsen-Cast ab (Energie/Druck/Struktur/Leitung) – siehe „Module & Casts".
+* Vier Schultertasten (R2/R1/L2/L1) feuern je einen Achsen-Cast ab (Energie/Druck/Struktur/Leitung) – siehe „Module & Casts".
 
-Der Spieler wählt vor dem Run pro Achse **Modifikatoren** (Form, Reichweite, Energietyp, Zusatzeffekt) über eine eigene Build-Auswahl-UI. Anders als ursprünglich geplant sind die vier Tasten selbst **nicht** frei mit beliebigen Modul-Kombinationen belegbar, sondern fest den vier Achsen zugeordnet.
+Der Spieler wählt vor dem Run pro Taste sowohl die **Achse** (Energie/Druck/Struktur/Leitung) als auch deren **Modifikatoren** (Form, Reichweite, Energietyp, Zusatzeffekt) über eine eigene Build-Auswahl-UI.
+
+> **Hinweis (Stand 2026-07-20):** Die Achsenzuordnung pro Taste ist frei wählbar (`core/player.gd::_resolve_axes()`) — eine Achse kann auf mehreren Tasten liegen oder ganz weggelassen werden. Ohne gespeicherten Build gilt weiterhin die historische Standardbelegung R2=Energie/R1=Druck/L2=Struktur/L1=Leitung.
 
 Das Designziel bleibt ein **einfach implementierbares, konsistentes und datengetriebenes Simulationssystem**, in dem neue Zauber-Modifikatoren, Materialien oder Energiekanäle automatisch neue Interaktionen ermöglichen.
 
@@ -223,7 +225,7 @@ Materialien besitzen weiterhin keine Speziallogik.
 
 # Module & Casts
 
-> **Wichtig:** Das ursprüngliche Modul-System (`modules/module.gd`, `energy_channel_module.gd`, `form_module.gd`, `modifier_module.gd`) existiert im Code, wird aber **nirgends instanziiert** – es sind nur unbenutzte typisierte Variablen in `spells/cast.gd`. Es handelt sich um totes/veraltetes Design. Tatsächlich implementiert ist das unten beschriebene System aus vier festen Achsen-Casts mit Modifikator-Slots.
+> **Wichtig:** Das ursprüngliche Modul-System (`modules/module.gd`, `energy_channel_module.gd`, `form_module.gd`, `modifier_module.gd`) existiert im Code, wird aber **nirgends instanziiert** – es sind nur unbenutzte typisierte Variablen in `spells/cast.gd`. Es handelt sich um totes/veraltetes Design. Tatsächlich implementiert ist das unten beschriebene System aus vier Achsen-Casts (Achse pro Taste frei wählbar) mit Modifikator-Slots.
 
 ## Feste Achsen (statt frei wählbarer Module)
 
@@ -436,5 +438,5 @@ Anders als im ursprünglichen Entwurf gibt es keinen separaten, global entkoppel
 * Materialien definieren ausschließlich Konstanten, keine Speziallogik.
 * Reaktionen/Statuseffekte sollen generisch und datengetrieben aus Zuständen entstehen – aktuell ist das nur für Brennen und Belastungsschaden umgesetzt, der Rest bleibt Designziel.
 * Schaden ist eine Folge der Simulation und kein direkter Zaubereffekt – gilt auch für Gegnerangriffe.
-* Die vier Schultertasten sind fest den vier Zustandsachsen zugeordnet; der Spieler personalisiert Zauber über Modifikatoren (Form/Reichweite/Energietyp/Zusatzeffekt), nicht über freie Achsen-/Formzuordnung.
+* Der Spieler personalisiert Zauber pro Taste über die freie Achsenwahl (Energie/Druck/Struktur/Leitung) und über Modifikatoren (Form/Reichweite/Energietyp/Zusatzeffekt).
 * Neue Materialien und Energiekanäle sollen sich automatisch in das bestehende System integrieren, ohne zusätzliche Speziallogik – neue Modifikatoren erfordern aktuell noch manuelle Einträge in `modifier_availability.json` und in den jeweiligen Cast-Klassen.

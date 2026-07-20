@@ -7,12 +7,16 @@ const _Registry := preload("res://core/build_registry.gd")
 @export var device_id: int = -1
 @export var level: Level
 
-# Slot indices match Cast.Axis enum — fixed to shoulder buttons:
-# R2=ENERGY, R1=PRESSURE, L2=STRUCTURE, L1=CONDUCTION
-const SLOT_ENERGY     = 0
-const SLOT_PRESSURE   = 1
-const SLOT_STRUCTURE  = 2
-const SLOT_CONDUCTION = 3
+# Physical shoulder-button slots. Which Cast.Axis fires on each is chosen
+# per-player in Build Selection (see _resolve_axes/_apply_build below).
+const BUTTON_R2 = 0
+const BUTTON_R1 = 1
+const BUTTON_L2 = 2
+const BUTTON_L1 = 3
+
+const _DEFAULT_AXES: Array[Cast.Axis] = [
+	Cast.Axis.ENERGY, Cast.Axis.PRESSURE, Cast.Axis.STRUCTURE, Cast.Axis.CONDUCTION,
+]
 
 var _casts: Array[Cast] = []
 var casts: Array[Cast]:
@@ -31,10 +35,9 @@ func _ready() -> void:
 	super._ready()
 
 	_casts.resize(4)
-	_assign_cast(SLOT_ENERGY, EnergyCast.new())
-	_assign_cast(SLOT_PRESSURE, PressureCast.new())
-	_assign_cast(SLOT_STRUCTURE, StructureCast.new())
-	_assign_cast(SLOT_CONDUCTION, ConductionCast.new())
+	var axes := _resolve_axes()
+	for slot in 4:
+		_assign_cast(slot, Cast.create(axes[slot]))
 
 	_apply_build()
 
@@ -234,22 +237,27 @@ func _get_cells_along_line(from: Vector3i, to: Vector3i) -> Array[Vector3i]:
 	return cells
 
 
+func _resolve_axes() -> Array[Cast.Axis]:
+	var axes := _DEFAULT_AXES.duplicate()
+	if device_id < 0 or device_id >= _Registry.builds.size() or _Registry.builds[device_id] == null:
+		return axes
+	var buttons: Array = _Registry.builds[device_id].get("buttons", [])
+	for slot in mini(4, buttons.size()):
+		var axis_name: String = buttons[slot].get("axis", "")
+		if axis_name != "":
+			axes[slot] = Cast.axis_from_name(axis_name)
+	return axes
+
+
 func _apply_build() -> void:
 	if device_id < 0 or device_id >= _Registry.builds.size() or _Registry.builds[device_id] == null:
 		return
 	var build: Dictionary = _Registry.builds[device_id]
-	var cast_mods: Dictionary = build.get("casts", {})
-	var cast_map := {
-		"Energy": SLOT_ENERGY,
-		"Conduction": SLOT_CONDUCTION,
-		"Pressure": SLOT_PRESSURE,
-		"Structure": SLOT_STRUCTURE,
-	}
-	for cast_name: String in cast_map:
-		var cast: Cast = _casts[cast_map[cast_name]]
-		if cast == null or not cast_mods.has(cast_name):
-			continue
-		_apply_cast_modifiers(cast, cast_mods[cast_name])
+	var buttons: Array = build.get("buttons", [])
+	for slot in mini(4, buttons.size()):
+		var cast: Cast = _casts[slot]
+		if cast != null:
+			_apply_cast_modifiers(cast, buttons[slot])
 
 
 func _apply_cast_modifiers(cast: Cast, mods: Dictionary) -> void:

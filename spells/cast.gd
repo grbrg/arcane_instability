@@ -3,6 +3,35 @@ extends Node
 
 enum Axis { ENERGY, PRESSURE, STRUCTURE, CONDUCTION }
 
+
+## Instantiates the Cast subclass for a given axis.
+static func create(a: Axis) -> Cast:
+	match a:
+		Axis.PRESSURE:   return PressureCast.new()
+		Axis.STRUCTURE:  return StructureCast.new()
+		Axis.CONDUCTION: return ConductionCast.new()
+	return EnergyCast.new()
+
+
+static func axis_from_name(s: String) -> Axis:
+	match s:
+		"PRESSURE":   return Axis.PRESSURE
+		"STRUCTURE":  return Axis.STRUCTURE
+		"CONDUCTION": return Axis.CONDUCTION
+	return Axis.ENERGY
+
+
+static func axis_to_name(a: Axis) -> String:
+	match a:
+		Axis.PRESSURE:   return "PRESSURE"
+		Axis.STRUCTURE:  return "STRUCTURE"
+		Axis.CONDUCTION: return "CONDUCTION"
+	return "ENERGY"
+
+
+static func create_from_name(s: String) -> Cast:
+	return create(axis_from_name(s))
+
 var axis: Axis = Axis.ENERGY
 var energy_channel: EnergyChannelModule = null
 var form: FormModule = null
