@@ -195,6 +195,11 @@ func get_cell(index: Vector3i) -> GridCell:
 
 
 ##
+func get_cell_indices() -> Array:
+	return _cells.keys()
+
+
+##
 func get_grid_index(pos: Vector2) -> Vector3i:
 	var target = Helper3D.get_object_at(camera, pos)
 	if target:

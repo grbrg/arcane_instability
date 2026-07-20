@@ -177,6 +177,33 @@ func apply_impulse_to_objects(impulse: Vector3) -> void:
 		character.receive_impulse(flat * CHARACTER_IMPULSE_SCALE)
 
 
+# Returns the current value of each axis in this cell, keyed by its debug-overlay
+# letter label: T(hermal) and P(ressure) from the ambient air, E(lectrical) and
+# A(rcane) from air, S(tructure) and C(onduction) from the strongest non-air object
+# present, and I(mpulse) magnitude. Axes with no source object in the cell are omitted.
+func get_debug_values() -> Dictionary:
+	var values := {}
+	for wo in world_objects:
+		if wo.substance_name == "air":
+			values["T"] = get_temperature()
+			values["P"] = get_pressure()
+			var electrical := wo.entity.get_property("electrical")
+			if electrical:
+				values["E"] = electrical.get_value()
+			var arcane := wo.entity.get_property("arcane")
+			if arcane:
+				values["A"] = arcane.get_value()
+		else:
+			var structure := wo.entity.get_property("structure")
+			if structure:
+				values["S"] = structure.get_value()
+			var conduction := wo.entity.get_property("conduction")
+			if conduction:
+				values["C"] = conduction.get_value()
+	values["I"] = current_impulse.length()
+	return values
+
+
 # Called every frame: integrates object velocities and updates the indicator.
 func apply_frame_movement(delta: float) -> void:
 	current_impulse = current_impulse.lerp(Vector3.ZERO, 1.0 - pow(1.0 - IMPULSE_DECAY, delta))
