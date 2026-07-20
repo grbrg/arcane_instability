@@ -148,8 +148,10 @@ func _update_character_cells() -> void:
 			continue
 		if old_index != Vector3i.MIN and old_index in _cells:
 			_cells[old_index].remove_character(character)
-		if new_index in _cells:
-			_cells[new_index].add_character(character)
+		var new_cell: GridCell = _cells.get(new_index, null)
+		if new_cell:
+			new_cell.add_character(character)
+		character.current_cell = new_cell
 		_character_cells[character] = new_index
 
 

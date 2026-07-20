@@ -7,6 +7,18 @@ const CHARACTER_IMPULSE_SCALE := 0.25
 # 0.9375 = retention squared vs. the old 0.75, i.e. same decay curve in half the time.
 const IMPULSE_DECAY := 0.99
 
+# Temperature at/above which traction is unaffected.
+# Air's thermal_capacity is 0.05 (substance_registry.gd), so a single cold hit at the
+# default cast/debug strength of 1.0 only moves air temperature by ~0.05 — these
+# thresholds are calibrated against that (a few stacked cold hits), not against
+# burning_temperature's 0.2-0.65 range (read off objects with much higher capacity,
+# e.g. grass/kindling).
+const COLD_TRACTION_START := -0.03
+# Temperature at/below which traction bottoms out (full ice).
+const COLD_TRACTION_FULL := -0.15
+# Acceleration multiplier on full ice.
+const MIN_TRACTION := 0.15
+
 var grid: GridMap
 var index: Vector3i
 var neighbours: Array[GridCell] = []
@@ -97,6 +109,36 @@ func get_pressure() -> float:
 			if prop:
 				return prop.get_value()
 	return 0.0
+
+
+# Returns the air temperature in this cell, falling back to ambient if no air object is present.
+func get_temperature() -> float:
+	for wo in world_objects:
+		if wo.substance_name == "air":
+			var prop := wo.entity.get_property("thermal") as ThermalEnergy
+			if prop:
+				return prop.get_temperature(ambient)
+	return ambient.temperature if ambient else 0.0
+
+
+# Acceleration multiplier characters should move with in this cell: 1.0 normally,
+# dropping toward MIN_TRACTION as the cell gets colder than COLD_TRACTION_START (ice).
+func get_traction() -> float:
+	var temp := get_temperature()
+	if temp >= COLD_TRACTION_START:
+		return 1.0
+	var t := clampf(inverse_lerp(COLD_TRACTION_START, COLD_TRACTION_FULL, temp), 0.0, 1.0)
+	return lerpf(1.0, MIN_TRACTION, t)
+
+
+# Moves a horizontal velocity toward a target (the desired move speed for characters,
+# Vector3.ZERO for friction on world objects) at `rate`, scaled by traction. Shared by
+# Character control and WorldObject friction so both slide the same way on icy cells.
+static func apply_traction(velocity: Vector3, target: Vector3, rate: float, traction: float, delta: float) -> Vector3:
+	var result := velocity
+	result.x = move_toward(result.x, target.x, rate * traction * delta)
+	result.z = move_toward(result.z, target.z, rate * traction * delta)
+	return result
 
 
 # Computes the impulse vector for this cell from pressure differences to neighbours.

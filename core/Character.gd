@@ -16,6 +16,8 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 
 var health: HealthComp
 
+var current_cell: GridCell
+
 
 @export_category("Jump")
 @export var jump_height : float = 2.0

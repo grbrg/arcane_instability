@@ -13,8 +13,10 @@ var _property_views = {}
 var current_cell: GridCell
 
 var _velocity: Vector3 = Vector3.ZERO
-# Fraction of velocity lost per second via friction.
-const VELOCITY_DECAY := 0.85
+# Deceleration from friction, in units/s^2. Scaled by the current cell's traction via
+# GridCell.apply_traction, the same mechanic that slows character control on ice, so a
+# pushed object slides further across a cold cell instead of stopping quickly.
+const FRICTION := 10.0
 
 
 func _ready() -> void:
@@ -103,7 +105,8 @@ func apply_velocity(delta: float) -> void:
 		_velocity = Vector3.ZERO
 		return
 	global_position += _velocity * delta
-	_velocity = _velocity.lerp(Vector3.ZERO, 1.0 - pow(1.0 - VELOCITY_DECAY, delta))
+	var traction: float = current_cell.get_traction() if current_cell else 1.0
+	_velocity = GridCell.apply_traction(_velocity, Vector3.ZERO, FRICTION, traction, delta)
 
 
 func invalidate_property_caches() -> void:

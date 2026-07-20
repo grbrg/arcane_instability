@@ -67,9 +67,9 @@ func _handle_jump() -> void:
 
 
 func _apply_movement(delta: float) -> void:
+	var traction: float = _player.current_cell.get_traction() if _player.current_cell else 1.0
 	var target := _move_dir * move_speed
-	_player.velocity.x = move_toward(_player.velocity.x, target.x, acceleration * delta)
-	_player.velocity.z = move_toward(_player.velocity.z, target.z, acceleration * delta)
+	_player.velocity = GridCell.apply_traction(_player.velocity, target, acceleration, traction, delta)
 
 
 func _update_rotation(delta: float, has_active_cast: bool) -> void:
