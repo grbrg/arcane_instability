@@ -56,7 +56,8 @@ func _ready() -> void:
 ## Damage = excess above tolerance, matching the system simulation loop (Step 6+7).
 func take_stress(total_energy: float, pressure: float) -> void:
 	var damage := (maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, pressure - pressure_tolerance)) * damage_scale
-	health.take_damage(damage)
+	if damage > 0:
+		health.take_damage(damage)
 
 
 ## Sums all energy channels across all world objects on the given cell and applies stress.
@@ -67,7 +68,9 @@ func apply_stress_from_cell(cell: GridCell) -> void:
 		for key in wo.entity.properties:
 			var prop = wo.entity.properties[key]
 			if prop is EnergyProperty and not (prop is PressureProperty):
-				energy_sum += prop.get_value()
+				if prop.get_value() > 0:
+					energy_sum += prop.get_value()
+					print(prop.get_value())
 		var pressure_prop = wo.entity.get_property("pressure")
 		if pressure_prop:
 			pressure += pressure_prop.get_value()

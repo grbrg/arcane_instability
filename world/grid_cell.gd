@@ -178,28 +178,42 @@ func apply_impulse_to_objects(impulse: Vector3) -> void:
 
 
 # Returns the current value of each axis in this cell, keyed by its debug-overlay
-# letter label: T(hermal) and P(ressure) from the ambient air, E(lectrical) and
-# A(rcane) from air, S(tructure) and C(onduction) from the strongest non-air object
-# present, and I(mpulse) magnitude. Axes with no source object in the cell are omitted.
+# letter label. T(hermal), E(lectrical), A(rcane) and P(ressure) are summed across every
+# world object in the cell exactly like Character.apply_stress_from_cell() sums them for
+# damage (T/E/A only counting positive contributions, P counting all), so these numbers
+# match what actually drives stress damage. S(tructure) and C(onduction) come from the
+# strongest non-air object present. I(mpulse) is the cell's current impulse magnitude.
 func get_debug_values() -> Dictionary:
+	var thermal := 0.0
+	var electrical := 0.0
+	var arcane := 0.0
+	var pressure := 0.0
 	var values := {}
 	for wo in world_objects:
-		if wo.substance_name == "air":
-			values["T"] = get_temperature()
-			values["P"] = get_pressure()
-			var electrical := wo.entity.get_property("electrical")
-			if electrical:
-				values["E"] = electrical.get_value()
-			var arcane := wo.entity.get_property("arcane")
-			if arcane:
-				values["A"] = arcane.get_value()
-		else:
+		var thermal_prop := wo.entity.get_property("thermal")
+		if thermal_prop and thermal_prop.get_value() > 0:
+			thermal += thermal_prop.get_value()
+		var electrical_prop := wo.entity.get_property("electrical")
+		if electrical_prop and electrical_prop.get_value() > 0:
+			electrical += electrical_prop.get_value()
+		var arcane_prop := wo.entity.get_property("arcane")
+		if arcane_prop and arcane_prop.get_value() > 0:
+			arcane += arcane_prop.get_value()
+		var pressure_prop := wo.entity.get_property("pressure")
+		if pressure_prop:
+			pressure += pressure_prop.get_value()
+
+		if wo.substance_name != "air":
 			var structure := wo.entity.get_property("structure")
 			if structure:
 				values["S"] = structure.get_value()
 			var conduction := wo.entity.get_property("conduction")
 			if conduction:
 				values["C"] = conduction.get_value()
+	values["T"] = thermal
+	values["E"] = electrical
+	values["A"] = arcane
+	values["P"] = pressure
 	values["I"] = current_impulse.length()
 	return values
 
