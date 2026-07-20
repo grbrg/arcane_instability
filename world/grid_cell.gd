@@ -87,11 +87,6 @@ func diffuse() -> void:
 		wo.diffuse_to_neighbours()
 
 
-func diffuse_pressure() -> void:
-	for wo in world_objects:
-		wo.diffuse_pressure_to_neighbours()
-
-
 func tick(delta: float) -> void:
 	for wo in world_objects:
 		wo.tick(delta, ambient)
@@ -160,7 +155,7 @@ func compute_impulse() -> Vector3:
 
 
 # Called once per tick: only replaces the stored impulse if the new gradient is stronger.
-func update_impulse(impulse: Vector3) -> void:
+func update_impulse(impulse: Vector3) -> void:	
 	if impulse.length() > current_impulse.length():
 		current_impulse = impulse
 

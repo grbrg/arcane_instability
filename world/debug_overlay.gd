@@ -79,7 +79,7 @@ func _draw() -> void:
 func _draw_cell_values(screen_pos: Vector2, values: Dictionary) -> void:
 	var rows: Array[String] = []
 	for label in AXIS_ORDER:
-		if values.has(label) and not is_zero_approx(values[label]):
+		if values.has(label) and abs(values[label]) > 0.009:
 			rows.append(label)
 
 	var start_y := screen_pos.y - (LINE_HEIGHT * rows.size()) * 0.5

@@ -66,11 +66,39 @@ func set_current_cell(new_cell: GridCell) -> void:
 	current_cell = new_cell
 
 
+## Sums this object's own energy channels (thermal/electrical/arcane), positive-only.
+func get_positive_energy_sum() -> float:
+	var total := 0.0
+	for key in entity.properties:
+		var prop = entity.properties[key]
+		if prop is EnergyProperty and not (prop is PressureProperty):
+			total += prop.get_damage_value()
+	return total
+
+
+## Damages this object's own structure once its energy exceeds the substance's tolerance.
+## Flat per-tick, matching Character.take_stress (both fire on the same simulation tick).
+func _apply_energy_stress() -> void:
+	var excess = maxf(0.0, get_positive_energy_sum() - substance.energy_tolerance)
+	if excess <= 0.0:
+		return
+	var structure = entity.get_property("structure")
+	if not structure:
+		return
+	var adj := StatAdjustment.new()
+	adj.source = "energy_stress"
+	adj.adjustment_type = "value"
+	adj.adjustment_value = -excess * substance.energy_damage_scale
+	structure.add_adjustment(adj)
+
+
 func tick(delta: float, ambient: Ambient) -> void:
 	for cond in conditions:
 		cond.tick(delta, entity, ambient)
 
 	entity.tick(delta, ambient)
+
+	_apply_energy_stress()
 
 	for key in _property_views:
 		_property_views[key].update(ambient)
@@ -114,28 +142,9 @@ func invalidate_property_caches() -> void:
 		entity.get_property(type).invalidate_cache()
 
 
-func diffuse_pressure_to_neighbours() -> void:
-	if not current_cell:
-		return
-	var prop := entity.get_property("pressure")
-	if not prop:
-		return
-	var val: float = prop.get_value()
-	var cond_val: float = prop.get_conductivity()
-	for n in current_cell.neighbours:
-		for n_obj in n.world_objects:
-			var n_prop = n_obj.entity.get_property("pressure")
-			if not n_prop:
-				continue
-			var amount: float = (val - n_obj.entity.get_property("pressure").get_value()) * cond_val
-			if amount > 0:
-				var adj := StatAdjustment.new()
-				adj.source = str(current_cell.index)
-				adj.adjustment_type = "value"
-				adj.adjustment_value = amount
-				n_obj.add_effect("pressure", adj)
-
-
+## Diffuses every EnergyProperty channel (thermal/electrical/arcane/pressure) to neighbouring
+## cells' world objects. Pressure is an EnergyProperty (see pressure_property.gd) so it's
+## covered here too — no separate pressure pass needed.
 func diffuse_to_neighbours() -> void:
 	if not current_cell:
 		return
@@ -144,14 +153,19 @@ func diffuse_to_neighbours() -> void:
 		if not prop is EnergyProperty:
 			continue
 		var val: float = prop.get_value()
-		var cond_val: float = prop.get_conductivity()
+		var cond_val: float = prop.get_conductivity() * prop.get_diffusion_rate()
 		for n in current_cell.neighbours:
 			for n_obj in n.world_objects:
 				var n_prop = n_obj.entity.get_property(type)
 				if not n_prop:
 					continue
 				var n_val: float = n_prop.get_value()
-				var amount: float = (val - n_val) * cond_val
+				var gap: float = val - n_val
+				# Clamp to the gap itself: the source is never decremented here, so an
+				# uncapped transfer with conductivity * diffusion_rate > 1.0 can push the
+				# neighbour past the source's own value, flipping which side is "high" and
+				# compounding into a runaway oscillation over subsequent ticks.
+				var amount: float = minf(gap * cond_val, gap)
 				if amount > 0:
 					var adj := StatAdjustment.new()
 					adj.source = str(current_cell.index)

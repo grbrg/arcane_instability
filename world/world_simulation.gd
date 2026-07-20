@@ -318,7 +318,7 @@ func _tick(delta: float) -> void:
 	# Only the stored (decaying) impulse drives velocity kicks, in _process, so a
 	# lingering gradient fades exponentially instead of re-kicking at full strength each tick.
 	for index in _cells:
-		var cell: GridCell = _cells[index]
+		var cell: GridCell = _cells[index]		
 		var impulse := cell.compute_impulse()
 		cell.update_impulse(impulse)
 
@@ -331,5 +331,4 @@ func _tick(delta: float) -> void:
 
 	for index in _cells:
 		_cells[index].diffuse()
-		_cells[index].diffuse_pressure()
 

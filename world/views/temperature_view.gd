@@ -5,7 +5,7 @@ extends EntityPropertyView
 @onready var mesh = $MeshInstance3D
 
 
-var _magnification = 8.0
+var _magnification = 1.0 / 1.5
 
 
 func _ready() -> void:
@@ -17,10 +17,10 @@ func set_temperature(temp: float) -> void:
 	mesh.set_instance_shader_parameter("temperature", clampf(temp * _magnification, -1.0, 1.0))
 
 
-func update(ambient: Ambient) -> void:
+func update(_ambient: Ambient) -> void:
 	if my_property:
 		var thermal = my_property as ThermalEnergy
 		if thermal:
-			var temp = thermal.get_temperature(ambient)
-			set_temperature(temp)
-			Log.v("Temperature: " + str(temp) + "°")
+			var value = thermal.get_value()
+			set_temperature(value)
+			Log.v("Thermal energy: " + str(value))

@@ -65,12 +65,7 @@ func apply_stress_from_cell(cell: GridCell) -> void:
 	var energy_sum := 0.0
 	var pressure := 0.0
 	for wo in cell.world_objects:
-		for key in wo.entity.properties:
-			var prop = wo.entity.properties[key]
-			if prop is EnergyProperty and not (prop is PressureProperty):
-				if prop.get_value() > 0:
-					energy_sum += prop.get_value()
-					print(prop.get_value())
+		energy_sum += wo.get_positive_energy_sum()
 		var pressure_prop = wo.entity.get_property("pressure")
 		if pressure_prop:
 			pressure += pressure_prop.get_value()
