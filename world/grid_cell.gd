@@ -177,12 +177,16 @@ func apply_impulse_to_objects(impulse: Vector3) -> void:
 		character.receive_impulse(flat * CHARACTER_IMPULSE_SCALE)
 
 
-# Returns the current value of each axis in this cell, keyed by its debug-overlay
-# letter label. T(hermal), E(lectrical), A(rcane) and P(ressure) are summed across every
-# world object in the cell exactly like Character.apply_stress_from_cell() sums them for
-# damage (T/E/A only counting positive contributions, P counting all), so these numbers
-# match what actually drives stress damage. S(tructure) and C(onduction) come from the
-# strongest non-air object present. I(mpulse) is the cell's current impulse magnitude.
+# Returns the current value of each axis in this cell, keyed by its debug-overlay letter
+# label. T(hermal), E(lectrical), A(rcane) and P(ressure) are the raw signed get_value()
+# summed across every world object in the cell, so a cold/inverted cast shows as negative
+# instead of vanishing. Character.apply_stress_from_cell() sums the same properties for
+# damage but additionally drops any per-object/channel value <= 0 before summing (so a
+# cold source can't cancel a hot source's damage elsewhere in the cell) — so T/E/A here
+# can differ from the damage total whenever a cell mixes positive and negative sources on
+# the same channel; in the common single-source case they match. S(tructure) and
+# C(onduction) come from the strongest non-air object present. I(mpulse) is the cell's
+# current impulse magnitude.
 func get_debug_values() -> Dictionary:
 	var thermal := 0.0
 	var electrical := 0.0
@@ -191,13 +195,13 @@ func get_debug_values() -> Dictionary:
 	var values := {}
 	for wo in world_objects:
 		var thermal_prop := wo.entity.get_property("thermal")
-		if thermal_prop and thermal_prop.get_value() > 0:
+		if thermal_prop:
 			thermal += thermal_prop.get_value()
 		var electrical_prop := wo.entity.get_property("electrical")
-		if electrical_prop and electrical_prop.get_value() > 0:
+		if electrical_prop:
 			electrical += electrical_prop.get_value()
 		var arcane_prop := wo.entity.get_property("arcane")
-		if arcane_prop and arcane_prop.get_value() > 0:
+		if arcane_prop:
 			arcane += arcane_prop.get_value()
 		var pressure_prop := wo.entity.get_property("pressure")
 		if pressure_prop:
