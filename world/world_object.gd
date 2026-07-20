@@ -164,9 +164,12 @@ func diffuse_to_neighbours() -> void:
 				# Clamp to the gap itself: the source is never decremented here, so an
 				# uncapped transfer with conductivity * diffusion_rate > 1.0 can push the
 				# neighbour past the source's own value, flipping which side is "high" and
-				# compounding into a runaway oscillation over subsequent ticks.
-				var amount: float = minf(gap * cond_val, gap)
-				if amount > 0:
+				# compounding into a runaway oscillation over subsequent ticks. Sign-aware
+				# so a negative gap (this object colder than the neighbour) clamps toward
+				# zero the same way a positive gap does, instead of always picking the more
+				# negative value.
+				var amount: float = minf(gap * cond_val, gap) if gap > 0 else maxf(gap * cond_val, gap)
+				if amount != 0:
 					var adj := StatAdjustment.new()
 					adj.source = str(current_cell.index)
 					adj.adjustment_type = "value"
