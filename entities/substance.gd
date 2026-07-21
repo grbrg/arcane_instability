@@ -25,13 +25,13 @@ extends Node
 @export_category("Structure")
 @export var structure_value: float = 50.0
 @export var structure_recovery: float = 0.05
-## Total energy (across all channels) this object can withstand before taking structural damage.
-@export var energy_tolerance: float = 0.5
-## Multiplier applied to excess energy before dealing structural damage.
-@export var energy_damage_scale: float = 20.0
 
 @export_category("Conduction")
 @export var conduction_value: float = 0.5
+
+## Per-axis tolerance/scale this object withstands before taking structural damage.
+## See AxisTolerance (entities/axis_tolerance.gd) — shared with Character.
+@export var axis_tolerance: AxisTolerance = AxisTolerance.new()
 
 
 ## List of substances this substance can morph into (water -> steam or ice)

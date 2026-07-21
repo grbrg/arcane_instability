@@ -5,9 +5,7 @@ extends EntityProperty
 # conductivity drives factor toward 1.0, and changed value triggers diffusion.
 
 
-## The portion of this channel's value that contributes to stress damage
-## (see Character.take_stress / WorldObject._apply_energy_stress). Negative
-## values (e.g. cold) never damage.
+## Negative values (e.g. cold) never damage; see EntityProperty.get_damage_value().
 func get_damage_value() -> float:
 	return maxf(0.0, get_value())
 

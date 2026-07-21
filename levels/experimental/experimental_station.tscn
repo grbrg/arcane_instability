@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://dn8177qto4xap" path="res://ui/versus_hud.gd" id="10_xohi2"]
 [ext_resource type="PackedScene" uid="uid://bv3lv2ptw3ygv" path="res://world/objects/wood_pile.tscn" id="12_141rh"]
 [ext_resource type="PackedScene" uid="uid://rg6ou58bnq5g" path="res://world/objects/grass.tscn" id="13_7act4"]
-[ext_resource type="Script" path="res://world/debug_overlay.gd" id="14_debug"]
+[ext_resource type="Script" uid="uid://drs8o7sbgl6ay" path="res://world/debug_overlay.gd" id="14_debug"]
 
 [sub_resource type="Sky" id="Sky_k2v8w"]
 
@@ -125,10 +125,12 @@ number_of_players = 2
 [node name="VersusHUD" type="CanvasLayer" parent="." unique_id=329399772]
 script = ExtResource("10_xohi2")
 
-[node name="DebugCanvasLayer" type="CanvasLayer" parent="."]
+[node name="DebugCanvasLayer" type="CanvasLayer" parent="." unique_id=463097937]
 layer = 2
 
-[node name="DebugOverlay" type="Control" parent="DebugCanvasLayer" node_paths=PackedStringArray("world_simulation", "camera")]
+[node name="DebugOverlay" type="Control" parent="DebugCanvasLayer" unique_id=1094249784 node_paths=PackedStringArray("world_simulation", "camera")]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("14_debug")
 world_simulation = NodePath("../../WorldSimulation")
 camera = NodePath("../../IsometricCamera3D")

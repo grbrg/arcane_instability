@@ -175,10 +175,11 @@ func apply_impulse_to_objects(impulse: Vector3) -> void:
 # Returns the current value of each axis in this cell, keyed by its debug-overlay letter
 # label. T(hermal), E(lectrical), A(rcane) and P(ressure) are the raw signed get_value()
 # summed across every world object in the cell, so a cold/inverted cast shows as negative
-# instead of vanishing. Character.apply_stress_from_cell() sums the same properties for
-# damage but additionally drops any per-object/channel value <= 0 before summing (so a
-# cold source can't cancel a hot source's damage elsewhere in the cell) — so T/E/A here
-# can differ from the damage total whenever a cell mixes positive and negative sources on
+# instead of vanishing. Character.apply_stress_from_cell() sums the same properties per
+# channel for damage but additionally drops any per-object/channel value <= 0 before summing
+# (so a cold source can't cancel a hot source's damage elsewhere in the cell), then checks
+# each channel's total against its own AxisTolerance entry — so T/E/A/P here can differ
+# from the per-channel damage totals whenever a cell mixes positive and negative sources on
 # the same channel; in the common single-source case they match. S(tructure) and
 # C(onduction) come from the strongest non-air object present. I(mpulse) is the cell's
 # current impulse magnitude.

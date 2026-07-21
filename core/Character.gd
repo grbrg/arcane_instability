@@ -6,12 +6,9 @@ const HEALTH_BAR_SCENE = preload("res://ui/health_bar.tscn")
 @export_category("Integrity")
 @export var max_integrity: float = 100.0
 @export var health_bar_offset: Vector3 = Vector3(0.0, 1.2, 0.0)
-## Total energy (across all channels) a character can withstand before taking damage.
-@export var energy_tolerance: float = 0.5
-## Pressure a character can withstand before taking damage.
-@export var pressure_tolerance: float = 2.0
-## Multiplier applied to excess energy/impulse before dealing damage.
-@export var damage_scale: float = 20.0
+## Per-axis tolerance/scale this character withstands before taking damage.
+## See AxisTolerance (entities/axis_tolerance.gd) — shared with WorldObject.
+@export var axis_tolerance: AxisTolerance = AxisTolerance.new()
 @export var mass: float = 1.0
 
 var health: HealthComp
@@ -52,24 +49,30 @@ func _ready() -> void:
 	add_child(bar)
 
 
-## Called by the simulation each tick with current entity state totals.
-## Damage = excess above tolerance, matching the system simulation loop (Step 6+7).
-func take_stress(total_energy: float, pressure: float) -> void:
-	var damage := (maxf(0.0, total_energy - energy_tolerance) + maxf(0.0, pressure - pressure_tolerance)) * damage_scale
+## Axes that stress a character standing in a cell. Excludes structure/conduction: those are
+## a world object's own material properties (its hitpoints, its conductivity), not something
+## that radiates out to bystanders the way heat, current, arcane charge or pressure do.
+const AMBIENT_AXES: Array[String] = ["thermal", "electrical", "arcane", "pressure"]
+
+
+## Called by the simulation each tick with per-axis energy totals for the cell.
+## Damage = each axis's excess above its own tolerance, summed (Step 6+7).
+func take_stress(channel_totals: Dictionary) -> void:
+	var damage := axis_tolerance.compute_damage(channel_totals)
 	if damage > 0:
 		health.take_damage(damage)
 
 
-## Sums all energy channels across all world objects on the given cell and applies stress.
+## Sums each ambient axis across all world objects on the given cell and applies stress,
+## checking each axis against its own tolerance instead of tolerancing their combined sum.
 func apply_stress_from_cell(cell: GridCell) -> void:
-	var energy_sum := 0.0
-	var pressure := 0.0
+	var channel_totals := {}
 	for wo in cell.world_objects:
-		energy_sum += wo.get_positive_energy_sum()
-		var pressure_prop = wo.entity.get_property("pressure")
-		if pressure_prop:
-			pressure += pressure_prop.get_value()
-	take_stress(energy_sum, pressure)
+		var wo_totals := wo.get_axis_totals()
+		for key in AMBIENT_AXES:
+			if key in wo_totals:
+				channel_totals[key] = channel_totals.get(key, 0.0) + wo_totals[key]
+	take_stress(channel_totals)
 
 
 func receive_impulse(impulse: Vector3) -> void:

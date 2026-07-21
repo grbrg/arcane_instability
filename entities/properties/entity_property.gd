@@ -131,6 +131,13 @@ func get_value():
 	return _value_cache
 
 
+## The portion of this property's value that contributes to axis-stress damage
+## (see AxisTolerance.compute_damage()). Overridden by EnergyProperty to drop negative
+## (e.g. cold) values, which never damage.
+func get_damage_value() -> float:
+	return get_value()
+
+
 ##
 func has_adjustment(source: String) -> bool:
 	var adj = get_adjustment_from(source)

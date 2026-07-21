@@ -66,29 +66,29 @@ func set_current_cell(new_cell: GridCell) -> void:
 	current_cell = new_cell
 
 
-## Sums this object's own energy channels (thermal/electrical/arcane), positive-only.
-func get_positive_energy_sum() -> float:
-	var total := 0.0
+## Returns every axis this object tracks (thermal/electrical/arcane/pressure/structure/
+## conduction), keyed by name, as its damage-relevant value. Feeds AxisTolerance.compute_damage.
+func get_axis_totals() -> Dictionary:
+	var totals := {}
 	for key in entity.properties:
-		var prop = entity.properties[key]
-		if prop is EnergyProperty and not (prop is PressureProperty):
-			total += prop.get_damage_value()
-	return total
+		totals[key] = entity.properties[key].get_damage_value()
+	return totals
 
 
-## Damages this object's own structure once its energy exceeds the substance's tolerance.
-## Flat per-tick, matching Character.take_stress (both fire on the same simulation tick).
-func _apply_energy_stress() -> void:
-	var excess = maxf(0.0, get_positive_energy_sum() - substance.energy_tolerance)
-	if excess <= 0.0:
+## Damages this object's own structure once any single axis exceeds the substance's tolerance
+## for that axis. Flat per-tick, matching Character.take_stress (both fire on the same
+## simulation tick).
+func _apply_axis_stress() -> void:
+	var damage := substance.axis_tolerance.compute_damage(get_axis_totals())
+	if damage <= 0.0:
 		return
 	var structure = entity.get_property("structure")
 	if not structure:
 		return
 	var adj := StatAdjustment.new()
-	adj.source = "energy_stress"
+	adj.source = "axis_stress"
 	adj.adjustment_type = "value"
-	adj.adjustment_value = -excess * substance.energy_damage_scale
+	adj.adjustment_value = -damage
 	structure.add_adjustment(adj)
 
 
@@ -98,7 +98,7 @@ func tick(delta: float, ambient: Ambient) -> void:
 
 	entity.tick(delta, ambient)
 
-	_apply_energy_stress()
+	_apply_axis_stress()
 
 	for key in _property_views:
 		_property_views[key].update(ambient)
