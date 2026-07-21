@@ -292,6 +292,7 @@ func _update_cell_highlight(idx: Vector3i) -> void:
 
 	if not idx in _highlight_meshes:
 		var mesh_inst := MeshInstance3D.new()
+		mesh_inst.add_to_group("no_toon")
 		var plane_mesh := PlaneMesh.new()
 		plane_mesh.size = Vector2(1.0, 1.0)
 		mesh_inst.mesh = plane_mesh
@@ -299,6 +300,10 @@ func _update_cell_highlight(idx: Vector3i) -> void:
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		# Without this, a toon-shaded surface behind the highlight (whose relight pass
+		# re-samples the screen and overwrites it) can draw after this and stomp it,
+		# since transparent materials don't write depth by default.
+		mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 		mesh_inst.material_override = mat
 		add_child(mesh_inst)
 		var cell_pos := grid.to_global(grid.map_to_local(idx))

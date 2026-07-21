@@ -23,6 +23,12 @@ func _ready() -> void:
 	player_spawner.player_spawned.connect(_on_player_spawned)
 	enemy_spawner.enemy_spawned.connect(_on_enemy_spawned)
 
+	# Toon-shade every mesh in the level (ground, walls, world objects, player, enemies)
+	# except property views, which are tagged to opt out -- see toon_relight.gd. Also
+	# catches meshes spawned later (players, enemies, projectiles).
+	ToonRelight.apply_to_subtree(self)
+	get_tree().node_added.connect(ToonRelight.apply_to_node)
+
 	player_spawner.spawn_all_players()
 
 

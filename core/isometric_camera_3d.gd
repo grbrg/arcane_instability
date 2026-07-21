@@ -71,5 +71,5 @@ func _process(delta):
 		
 		dir = dir.rotated(Vector3(0, 1, 0), global_rotation.y)	
 		_velocity += (dir.normalized() * move_speed)
-		
+
 		global_position += _velocity * delta
