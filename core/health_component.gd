@@ -16,7 +16,7 @@ func _ready() -> void:
 
 
 func take_damage(amount: float) -> void:
-	if amount <= 0.0:
+	if amount <= 0.0 or is_dead():
 		return
 	integrity = maxf(0.0, integrity - amount)
 	integrity_changed.emit(integrity, max_integrity)

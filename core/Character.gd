@@ -35,6 +35,19 @@ var was_falling: bool = false
 const FALLING_MAX = 9999999.9
 var falling_y: float = FALLING_MAX
 
+@onready var mesh: MeshInstance3D = %Main_Mesh
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
+
+const ANIM_IDLE := "idle"
+const ANIM_RUN := "run"
+const ANIM_JUMP := "jump"
+const ANIM_CAST := "cast"
+const ANIM_DIE := "die"
+const DEATH_REMOVE_DELAY := 3.0
+const MOVE_ANIM_THRESHOLD := 0.1
+
+var _is_dying: bool = false
+var _one_shot_playing: bool = false
 
 
 func _ready() -> void:
@@ -42,6 +55,7 @@ func _ready() -> void:
 	health.max_integrity = max_integrity
 	health.name = "HealthComponent"
 	add_child(health)
+	health.died.connect(_on_died)
 
 	var bar: HealthBar = HEALTH_BAR_SCENE.instantiate()
 	bar.character = self
@@ -115,12 +129,44 @@ func try_jump():
 func jump():
 	velocity.y = _jump_velocity
 	_jump_count += 1
-	#state = "jump"
 
-	if is_on_floor():
-		#self.sprite.play("jump")
-		pass
+
+## Called when health reaches zero: plays the death animation, then removes
+## the character from the scene 3s after the animation finishes.
+func _on_died() -> void:
+	_is_dying = true
+	velocity.x = 0.0
+	velocity.z = 0.0
+	if anim_player != null and anim_player.has_animation(ANIM_DIE):
+		anim_player.play(ANIM_DIE)
+		await anim_player.animation_finished
+		await get_tree().create_timer(DEATH_REMOVE_DELAY).timeout
+	queue_free()
+
+
+## Plays a one-off animation (e.g. cast) that update_animation() won't
+## interrupt with idle/run/jump until it finishes.
+func play_one_shot(anim_name: String) -> void:
+	if _is_dying or anim_player == null or not anim_player.has_animation(anim_name):
+		return
+	_one_shot_playing = true
+	anim_player.play(anim_name)
+	await anim_player.animation_finished
+	_one_shot_playing = false
+
+
+## Drives idle/run/jump based on current physics state. Call once per physics
+## frame; does nothing while dying or while a one-shot animation is playing.
+func update_animation() -> void:
+	if _is_dying or _one_shot_playing:
+		return
+	var target: String
+	if not is_on_floor():
+		target = ANIM_JUMP
+	elif Vector2(velocity.x, velocity.z).length() > MOVE_ANIM_THRESHOLD:
+		target = ANIM_RUN
 	else:
-		#self.sprite.play("double_jump")
-		pass
+		target = ANIM_IDLE
+	if anim_player.current_animation != target:
+		anim_player.play(target)
 

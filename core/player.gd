@@ -28,7 +28,6 @@ var _player_color: Color = Color.WHITE
 var _has_highlights: bool = false
 
 @onready var _cast_marker: SpellMarker = $SpellMarker
-@onready var mesh: MeshInstance3D = $MeshInstance3D
 
 
 func _ready() -> void:
@@ -65,18 +64,26 @@ func set_player_color(color: Color) -> void:
 
 
 func set_move_input(dir: Vector3) -> void:
+	if _is_dying:
+		return
 	_controller.set_move_input(dir)
 
 
 func handle_joypad_button(event: InputEventJoypadButton) -> void:
+	if _is_dying:
+		return
 	_controller.handle_joypad_button(event)
 
 
 func poll_joypad(joypad_id: int, camera: Camera3D) -> void:
+	if _is_dying:
+		return
 	_controller.poll_joypad(joypad_id, camera)
 
 
 func request_jump() -> void:
+	if _is_dying:
+		return
 	_controller.request_jump()
 
 
@@ -100,7 +107,7 @@ func set_cast_marker_visible(marker_visible: bool) -> void:
 
 
 func request_cast(slot: int) -> void:
-	if _active_cast != null or slot >= _casts.size():
+	if _is_dying or _active_cast != null or slot >= _casts.size():
 		return
 	var cast := _casts[slot]
 	if cast != null and not cast.is_on_cooldown:
@@ -109,7 +116,7 @@ func request_cast(slot: int) -> void:
 
 
 func release_cast(slot: int) -> void:
-	if slot >= _casts.size():
+	if _is_dying or slot >= _casts.size():
 		return
 	var cast := _casts[slot]
 	if cast != null and cast == _active_cast:
@@ -138,6 +145,7 @@ func release_cast(slot: int) -> void:
 			projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
 			projectile.setup(cast, target_pos, world_sim)
 
+		play_one_shot(ANIM_CAST)
 		_active_cast = null
 
 
@@ -153,8 +161,12 @@ func _resolve_around_player(cast: Cast, player_cell: Vector3i, world_sim: WorldS
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		apply_gravity(delta)
+	if _is_dying:
+		move_and_slide()
+		return
 	_controller.physics_process(delta, _active_cast != null)
 	_process_casts(delta)
+	update_animation()
 
 
 func _process_casts(delta: float) -> void:

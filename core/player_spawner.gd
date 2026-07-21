@@ -80,5 +80,6 @@ func _on_player_died(player: Player, device_id: int) -> void:
 		level.players.erase(player)
 		if level.camera:
 			level.camera.remove_follow_target(player)
-	player.queue_free()
+	# Character._on_died() owns queue_free() itself, after the die animation
+	# finishes plus a 3s delay — don't race it by freeing the node here.
 	get_tree().create_timer(respawn_delay).timeout.connect(func(): _spawn_player(device_id))

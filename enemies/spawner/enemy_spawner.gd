@@ -54,9 +54,10 @@ func _spawn_enemy() -> void:
 	enemy_spawned.emit(enemy)
 
 
-func _on_enemy_died(enemy: Enemy) -> void:
+func _on_enemy_died(_enemy: Enemy) -> void:
 	enemy_died.emit()
-	enemy.queue_free()
+	# Character._on_died() owns queue_free() itself, after any die animation
+	# finishes plus a delay — don't race it by freeing the node here.
 	_living_enemies -= 1
 	if _living_enemies <= 0:
 		_start_next_wave()
