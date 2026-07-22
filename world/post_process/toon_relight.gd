@@ -75,6 +75,7 @@ static func apply_to_csg(shape: CSGShape3D) -> void:
 static func apply_to_node(node: Node) -> void:
 	if node is SpellMarker:
 		return
+	return
 
 	if node is MeshInstance3D:
 		apply_to_mesh(node)
