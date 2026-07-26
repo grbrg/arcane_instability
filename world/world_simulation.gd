@@ -122,8 +122,20 @@ func unregister_character(character: Character) -> void:
 	_character_cells.erase(character)
 
 
-func _world_to_grid(world_pos: Vector3) -> Vector3i:
-	return grid.local_to_map(grid.to_local(world_pos))
+## Maps a world position to a grid cell index. If the exact cell is empty,
+## searches straight down (up to max_height_above) for the nearest occupied
+## cell, so objects resting above a cell (not just inside it) still count as
+## being in that cell.
+func _world_to_grid(world_pos: Vector3, max_height_above: float = 0.0) -> Vector3i:
+	var index := grid.local_to_map(grid.to_local(world_pos))
+	if index in _cells or max_height_above <= 0.0:
+		return index
+	var steps := int(ceil(max_height_above / grid.cell_size.y))
+	for i in range(1, steps + 1):
+		var candidate := Vector3i(index.x, index.y - i, index.z)
+		if candidate in _cells:
+			return candidate
+	return index
 
 
 ##
@@ -157,7 +169,7 @@ func _update_character_cells() -> void:
 
 func _update_world_object_cells() -> void:
 	for wo in _world_objects:
-		var new_index := _world_to_grid(wo.global_position)
+		var new_index := _world_to_grid(wo.global_position, 1.0)
 		var old_index: Vector3i = _world_object_cells.get(wo, Vector3i.MIN)
 		if new_index == old_index:
 			continue

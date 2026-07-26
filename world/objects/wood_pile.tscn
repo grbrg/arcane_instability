@@ -39,6 +39,6 @@ mesh = SubResource("BoxMesh_l3fvf")
 surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")
 
 [node name="MeshInstance3D4" type="MeshInstance3D" parent="." unique_id=1932878988]
-transform = Transform3D(0.79162484, -0.5504052, -0.26529974, 0.42507094, 0.80800676, -0.40797037, 0.4389131, 0.21018843, 0.8735997, 0.0033231974, 0.11774579, 0)
+transform = Transform3D(0.8402186, -0.44055027, -0.31614536, 0.31841463, 0.87277514, -0.36996752, 0.4389132, 0.21018848, 0.8735998, 0.0033231974, 0.17124406, 0)
 mesh = SubResource("BoxMesh_1cc12")
 surface_material_override/0 = SubResource("StandardMaterial3D_hfyow")

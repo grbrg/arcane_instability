@@ -32,6 +32,6 @@ void fragment() {
 
 	float is_hot = step(0.0, temperature);
 	vec3 tint = mix(vec3(0.05, 0.2, 1.0), vec3(1.0, 0.1, 0.05), is_hot);
-	ALBEDO = mix(distorted.rgb, tint, abs_temp * 0.15);
-	ALPHA = 0.5 ; //abs_temp * 0.5;
+	ALBEDO = mix(distorted.rgb, tint, abs_temp * 0.5);
+	ALPHA = abs_temp * 0.8;
 }

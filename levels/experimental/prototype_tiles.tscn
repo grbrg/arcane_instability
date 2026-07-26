@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://f6jvq6jb08xo"]
+
+[ext_resource type="Texture2D" uid="uid://c8n0yfu0biy2v" path="res://levels/experimental/grey_07.png" id="1_04osc"]
+[ext_resource type="Texture2D" uid="uid://brlm75hy10726" path="res://levels/experimental/orange_10.png" id="2_nc4b4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nc4b4"]
+albedo_texture = ExtResource("1_04osc")
+
+[sub_resource type="BoxMesh" id="BoxMesh_tpy0r"]
+material = SubResource("StandardMaterial3D_nc4b4")
+size = Vector3(1, 0.2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nc4b4"]
+size = Vector3(1, 0.2, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_nc4b4"]
+load_path = "res://.godot/imported/grey_08.png-da6c18f0aad0224b27e1012d568af265.s3tc.ctex"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a175n"]
+albedo_texture = SubResource("CompressedTexture2D_nc4b4")
+uv1_scale = Vector3(2, 2, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cmf5g"]
+material = SubResource("StandardMaterial3D_a175n")
+size = Vector3(1, 0.2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a175n"]
+size = Vector3(1, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cmf5g"]
+albedo_texture = ExtResource("2_nc4b4")
+uv1_scale = Vector3(2, 2, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_04osc"]
+material = SubResource("StandardMaterial3D_cmf5g")
+size = Vector3(1, 0.2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cmf5g"]
+size = Vector3(1, 0.2, 1)
+
+[node name="PrototypeTiles" type="Node2D" unique_id=322876362]
+
+[node name="grey_check" type="MeshInstance3D" parent="." unique_id=961611166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+visible = false
+mesh = SubResource("BoxMesh_tpy0r")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="grey_check" unique_id=515454471]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="grey_check/StaticBody3D" unique_id=785360448]
+shape = SubResource("BoxShape3D_nc4b4")
+
+[node name="grey_check2" type="MeshInstance3D" parent="." unique_id=1930885514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+visible = false
+mesh = SubResource("BoxMesh_cmf5g")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="grey_check2" unique_id=1094238433]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="grey_check2/StaticBody3D" unique_id=158203518]
+shape = SubResource("BoxShape3D_a175n")
+
+[node name="orange_check" type="MeshInstance3D" parent="." unique_id=1508306379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+visible = false
+mesh = SubResource("BoxMesh_04osc")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="orange_check" unique_id=2123762743]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="orange_check/StaticBody3D" unique_id=609857971]
+shape = SubResource("BoxShape3D_cmf5g")
