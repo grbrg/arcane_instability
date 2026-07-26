@@ -140,10 +140,18 @@ func release_cast(slot: int) -> void:
 			var index := grid.local_to_map(grid.to_local(target_pos))
 			cast.deactivate_marker(world_sim, index)
 
-			var projectile := CAST_PROJECTILE_SCENE.instantiate()
-			level.add_child(projectile)
-			projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
-			projectile.setup(cast, target_pos, world_sim)
+			if cast.area_modifier != null \
+					and cast.area_modifier.target_area == AreaModifier.TargetArea.PROJECTILE:
+				var projectile := CAST_PROJECTILE_SCENE.instantiate()
+				level.add_child(projectile)
+				projectile.global_position = global_position + Vector3(0.0, 0.5, 0.0)
+				projectile.setup(cast, target_pos, world_sim)
+			elif cast.area_modifier != null \
+					and cast.area_modifier.target_area == AreaModifier.TargetArea.BEAM:
+				_resolve_beam(cast, player_cell, index, world_sim)
+			else:
+				cast.resolve(world_sim)
+				world_sim.force_tick()
 
 		play_one_shot(ANIM_CAST)
 		_active_cast = null
@@ -155,6 +163,16 @@ func _resolve_around_player(cast: Cast, player_cell: Vector3i, world_sim: WorldS
 		return
 	for neighbour in center.neighbours:
 		cast.apply_to_cell(world_sim, neighbour.index, cast.strength)
+	world_sim.force_tick()
+
+
+func _resolve_beam(cast: Cast, player_cell: Vector3i, target_cell: Vector3i, world_sim: WorldSimulation) -> void:
+	var line := _get_cells_along_line(player_cell, target_cell)
+	if not line.is_empty() and line[0] == player_cell:
+		line.remove_at(0)
+	for cell in line:
+		if world_sim.get_cell(cell) != null:
+			cast.apply_to_cell(world_sim, cell, cast.strength)
 	world_sim.force_tick()
 
 

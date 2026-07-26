@@ -19,12 +19,16 @@ var _arrived: bool = false
 var _last_radiated_cell: Vector3i = Vector3i.MIN
 var _affected_cells: Dictionary = {}
 var _is_shard: bool = false
+var _final_cell: Vector3i
 
 
 func setup(cast: Cast, target: Vector3, world_sim: WorldSimulation) -> void:
 	_cast = cast
 	_target_position = target
 	_world_simulation = world_sim
+	var grid := world_sim.grid
+	_final_cell = grid.local_to_map(grid.to_local(target))
+	_final_cell.y = cast.resolve_cell.y
 
 
 func _process(delta: float) -> void:
@@ -50,25 +54,21 @@ func _try_radiate() -> void:
 		return
 	if current_cell == _cast.player_cell:
 		return
+	# The destination cell gets its own full-strength hit on arrival (see _arrive);
+	# radiating into it here as well would double-apply the effect there.
+	if current_cell == _final_cell:
+		return
 	if _world_simulation.get_cell(current_cell) == null:
 		return
 	_affected_cells[current_cell] = true
-	var is_beam := _cast.area_modifier != null \
-		and _cast.area_modifier.target_area == AreaModifier.TargetArea.BEAM
-	var radiate_strength := _cast.strength if is_beam else (_cast.strength / 2)
-	_cast.apply_to_cell(_world_simulation, current_cell, radiate_strength)
-	if is_beam:
-		_world_simulation.force_tick()
+	_cast.apply_to_cell(_world_simulation, current_cell, _cast.strength / 2)
 
 
 func _arrive() -> void:
 	_arrived = true
 	if _is_shard:
-		var grid := _world_simulation.grid
-		var cell := grid.local_to_map(grid.to_local(global_position))
-		cell.y = _cast.resolve_cell.y
-		if cell != _cast.player_cell:
-			_cast.apply_to_cell(_world_simulation, cell, _cast.strength)
+		if _final_cell != _cast.player_cell:
+			_cast.apply_to_cell(_world_simulation, _final_cell, _cast.strength)
 	else:
 		_cast.resolve(_world_simulation)
 		_spawn_bounce_shards()
