@@ -21,6 +21,13 @@ var _affected_cells: Dictionary = {}
 var _is_shard: bool = false
 var _final_cell: Vector3i
 
+@onready var _sound: AudioStreamPlayer3D = $Sound
+
+
+func _ready() -> void:
+	_sound.finished.connect(_sound.play)
+	_sound.play()
+
 
 func setup(cast: Cast, target: Vector3, world_sim: WorldSimulation) -> void:
 	_cast = cast

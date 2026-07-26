@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://ckp0tlvn8kamb"]
 
 [ext_resource type="Script" uid="uid://ck6mjuef82f2l" path="res://spells/cast_projectile.gd" id="Script_cast_projectile"]
+[ext_resource type="AudioStream" uid="uid://cqwthxolitu1r" path="res://spells/sound/burning_ball.wav" id="2_sound"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_lct76"]
 radius = 0.25
@@ -18,3 +19,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_6grrg")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=804617375]
 light_color = Color(1, 0.59607846, 0.1882353, 1)
+
+[node name="Sound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("2_sound")

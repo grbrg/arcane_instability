@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://s2n1uamlgtim" path="res://world/conditions/burning/burning_view.gd" id="1_aiju2"]
 [ext_resource type="Texture2D" uid="uid://bk8gk6y2omd6w" path="res://world/conditions/burning/texture_fire2.png" id="1_tjils"]
 [ext_resource type="Texture2D" uid="uid://cbw6tf2ftl32m" path="res://world/conditions/burning/texture_spark.PNG" id="2_8vtr6"]
+[ext_resource type="AudioStream" uid="uid://cml5xd2wj7rb3" path="res://spells/sound/burning.wav" id="3_sound"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tjils"]
 transparency = 1
@@ -160,3 +161,6 @@ light_energy = 2.781
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=721431639]
 libraries/ = SubResource("AnimationLibrary_5puax")
 autoplay = &"Init"
+
+[node name="Sound" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("3_sound")
