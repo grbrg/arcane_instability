@@ -3,8 +3,6 @@ extends Node3D
 
 @export var move_speed := 7.5
 
-const ARRIVAL_THRESHOLD := 0.3
-
 const _BOUNCE_DIRS: Array[Vector3i] = [
 	Vector3i( 1, 0,  0), Vector3i(-1, 0,  0),
 	Vector3i( 0, 0,  1), Vector3i( 0, 0, -1),
@@ -13,7 +11,8 @@ const _BOUNCE_DIRS: Array[Vector3i] = [
 ]
 
 var _cast: Cast
-var _target_position: Vector3
+var _velocity: Vector3
+var _lifetime: float = 0.0
 var _world_simulation: WorldSimulation
 var _arrived: bool = false
 var _last_radiated_cell: Vector3i = Vector3i.MIN
@@ -31,22 +30,28 @@ func _ready() -> void:
 
 func setup(cast: Cast, target: Vector3, world_sim: WorldSimulation) -> void:
 	_cast = cast
-	_target_position = target
 	_world_simulation = world_sim
 	var grid := world_sim.grid
 	_final_cell = grid.local_to_map(grid.to_local(target))
 	_final_cell.y = cast.resolve_cell.y
+	var to_target := target - global_position
+	var dist := to_target.length()
+	_velocity = to_target.normalized() * move_speed
+	# Aim at the target cell for as long as covering that distance would take;
+	# once the timer runs out the projectile dies wherever it actually ended up,
+	# which lets impulses or collisions carry it off its original line.
+	_lifetime = dist / maxf(move_speed, 0.001)
 
 
 func _process(delta: float) -> void:
 	if _arrived:
 		return
-	var to_target := _target_position - global_position
-	var dist := to_target.length()
-	if dist <= ARRIVAL_THRESHOLD:
+	var step := minf(delta, _lifetime)
+	global_position += _velocity * step
+	_lifetime -= step
+	if _lifetime <= 0.0:
 		_arrive()
 		return
-	global_position += to_target.normalized() * minf(move_speed * delta, dist)
 	_try_radiate()
 
 
@@ -73,10 +78,14 @@ func _try_radiate() -> void:
 
 func _arrive() -> void:
 	_arrived = true
+	var grid := _world_simulation.grid
+	var current_cell := grid.local_to_map(grid.to_local(global_position))
+	current_cell.y = _cast.resolve_cell.y
 	if _is_shard:
-		if _final_cell != _cast.player_cell:
-			_cast.apply_to_cell(_world_simulation, _final_cell, _cast.strength)
+		if current_cell != _cast.player_cell:
+			_cast.apply_to_cell(_world_simulation, current_cell, _cast.strength)
 	else:
+		_cast.resolve_cell = current_cell
 		_cast.resolve(_world_simulation)
 		_spawn_bounce_shards()
 	_world_simulation.force_tick()

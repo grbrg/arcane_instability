@@ -93,6 +93,7 @@ var player_cell: Vector3i = Vector3i.MIN
 
 var resolve_cell: Vector3i:
 	get: return _resolve_cell
+	set(value): _resolve_cell = value
 
 
 func activate_marker(origin: Vector3, dir: Vector3) -> void:
