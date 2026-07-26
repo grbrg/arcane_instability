@@ -154,6 +154,13 @@ func diffuse_to_neighbours() -> void:
 			continue
 		var val: float = prop.get_value()
 		var cond_val: float = prop.get_conductivity() * prop.get_diffusion_rate()
+		# Each neighbour's pull is computed independently off the same full gap, so without
+		# apportioning, a cell with N neighbours loses up to N times its intended share in a
+		# single tick (the source is never decremented directly, but every neighbour reverses
+		# the same amount back out via its own diffuse_to_neighbours() call). Divide by
+		# neighbour count so the total transferred out matches gap * conductivity, matching
+		# the averaging GridCell.compute_impulse() already does for pressure.
+		var neighbour_count: int = current_cell.neighbours.size()
 		for n in current_cell.neighbours:
 			for n_obj in n.world_objects:
 				var n_prop = n_obj.entity.get_property(type)
@@ -168,7 +175,7 @@ func diffuse_to_neighbours() -> void:
 				# so a negative gap (this object colder than the neighbour) clamps toward
 				# zero the same way a positive gap does, instead of always picking the more
 				# negative value.
-				var amount: float = minf(gap * cond_val, gap) if gap > 0 else maxf(gap * cond_val, gap)
+				var amount: float = (minf(gap * cond_val, gap) if gap > 0 else maxf(gap * cond_val, gap)) / neighbour_count
 				if amount != 0:
 					var adj := StatAdjustment.new()
 					adj.source = str(current_cell.index)
